@@ -18,7 +18,7 @@
       height: 100%;
       font-family: 'Times New Roman', Times, serif;
       color:Red;
-      font-size: 1.5em;
+      font-size: 1.4em;
     }
 
     .top_controls, .bottom_controls {
@@ -95,6 +95,7 @@
 
   <div class='top_controls'>
     <button onclick='shuffle_cards();'>Shuffle</button>
+    <button onclick='flip_cards();'>Flip</button>
     <button onclick='set_score(0);'>Reset</button>
     <div class='score'><div id='score' class='center'>Score: 0</div></div>
   </div>
@@ -125,6 +126,7 @@
 
     var cards=[];
     var score=0;
+    var reverse=false;
 
     function init() {
       Tabletop.init( { key: url, callback: load_cards, simpleSheet: true } );
@@ -145,6 +147,11 @@
       set_score(0);
 
       // Show the top card
+      show_question();
+    }
+
+    function flip_cards() {
+      reverse = !reverse;
       show_question();
     }
 
@@ -221,13 +228,15 @@
     // Displays the top card qestion & answer
     function show_question() { console.log('show_question()');
       if(cards[0]) {
-        document.getElementById('div-question').innerHTML = cards[0].q;
+        if(reverse) document.getElementById('div-question').innerHTML = cards[0].a;
+        else        document.getElementById('div-question').innerHTML = cards[0].q;
         document.getElementById('div-answer')  .innerHTML = '&nbsp'
       }
     }
     function show_answer() { console.log('show_answer()');
       if(cards[0]) {
-        document.getElementById('div-answer').innerHTML = cards[0].a;
+        if(reverse) document.getElementById('div-answer').innerHTML = cards[0].q;
+        else        document.getElementById('div-answer').innerHTML = cards[0].a;
       }
     }
 
