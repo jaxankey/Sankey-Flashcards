@@ -8,7 +8,7 @@ Turn any published google sheet into Sankey-method flashcards on any internet-co
  3. Finish the process and return to the sheet itself, then copy its URL (or just the sheet id) from the browser's address bar.
  4. Paste this onto the end of the following URL: `https://jaxankey.github.io/Sankey-Flashcards/?`.
 
-Okay, so maybe assembling the URL is a bit painful, but once you have done this correctly, it is a permanent link that will update whenever you change your google sheet. Here are two examples of working URLs: 
+Okay, so maybe assembling the URL is a bit painful, but once you have done this correctly, it is a permanent link that will update whenever you change your google sheet. Here are two examples of working URLs pointing to the same [math drill sheet](https://docs.google.com/spreadsheets/d/1IfWy8aefe9aNUO3OJ2bKv2Vtb28eEx2XUfMyYPiZv8c/): 
  * [Full Address URL](https://jaxankey.github.io/Sankey-Flashcards/?https://docs.google.com/spreadsheets/d/1IfWy8aefe9aNUO3OJ2bKv2Vtb28eEx2XUfMyYPiZv8c/edit#gid=0)
  * [Document ID URL](https://jaxankey.github.io/Sankey-Flashcards/?1IfWy8aefe9aNUO3OJ2bKv2Vtb28eEx2XUfMyYPiZv8c).
 
