@@ -4,7 +4,7 @@ Turn any published google sheet into Sankey flashcards and share your creation w
 # Linking the App to a Google Sheet
 
  1. Create a [Google Sheets](https://docs.google.com/spreadsheets/u/0/) document with a column for questions and a column for answers. The first row will be ignored, so you can use this as a column label. Add a few entries to play with.
- 2. Select `File` -> `Publish to the web`, select the first sheet (e.g. `Sheet0`) and `Comma-separated values (.csv)'`, then push the green `Publish` button.
+ 2. Select `File` -> `Publish to the web`, select the desired sheets and `Comma-separated values (.csv)'`, then push the green `Publish` button.
  3. Finish the process and return to the sheet itself, then copy its URL (or just the sheet id) from the browser's address bar.
  4. Paste this onto the end of the following URL: `https://jaxankey.github.io/Sankey-Flashcards/?`. See examples below.
 
