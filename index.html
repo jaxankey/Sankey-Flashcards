@@ -1,0 +1,239 @@
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Sankey Flashcards</title>
+  <meta name="description" content="Turn any spreadsheet into my favorite memorization drill technique.">
+  <meta name="author"      content="Jack C. Sankey">
+
+  <style>
+
+    body {
+      display: flex;
+      flex-direction: column;
+      padding: 0;
+      margin: 0;
+      height: 100%;
+      font-family: 'Times New Roman', Times, serif;
+      color:Red;
+      font-size: 1.5em;
+    }
+
+    .top_controls, .bottom_controls {
+      display: flex;
+      flex-direction: row;
+      padding-left: 3.5px;
+      padding-right: 3.5px;
+    }
+
+    .score {
+      padding-left: 0.2em;
+      font-weight: bold;
+    }
+
+    .content {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .question, .answer {
+      flex-grow: 1;
+      text-align: center;
+      font-size: 2.5em;
+      margin-left: 7px;
+      margin-right: 7px;
+      background-color: white;
+    }
+    .question {
+      margin-bottom: 3.5px;
+      border: solid #00F4 1px;
+      color:blue;
+      background-color: #F7F7FF;
+    }
+    .answer {
+      margin-top: 3.5px;
+      border: solid #F004 1px;
+      color:red;
+      background-color: #FFF7F7;
+    }
+
+    .center {
+      margin: 0;
+      position: relative;
+      top: 50%;
+      -ms-transform: translateY(-50%);
+      transform: translateY(-50%);
+    }
+
+    .control {
+      flex-grow: 1;
+    }
+
+    button {
+      background-color:white;
+      color: rgb(150, 150, 150);
+      border: solid rgb(197, 197, 197) 1px;
+      padding: 0.3em;
+      padding-left: 0.4em;
+      padding-right: 0.4em; 
+      display: inline-block;
+      font-size: 0.8em;
+      margin: 7px 3.5px;
+      cursor: pointer;
+      font-family: 'Times New Roman', Times, serif;
+      font-weight: bold;
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+  <div class='top_controls'>
+    <button onclick='shuffle_cards();'>Shuffle</button>
+    <button onclick='reset();'>Reset</button>
+    <div class='score'><div id='score' class='center'>Score: 0</div></div>
+  </div>
+  
+  <a onclick='show_answer()' class='content'>
+    <div class='content'>
+      <div class='question'><div id='div-question' class='center'>Loading...</div></div>
+      <div class='answer'  ><div id='div-answer'   class='center'>&nbsp;</div></div>
+    </div>
+  </a>
+
+  <div class='bottom_controls'>
+    <button onclick='send_card_to(1,1);'  class='control' style='border: solid #F004 1px; color:red'>Redo</button>
+    <button onclick='send_card_to(2,3);'  class='control' style='border: solid #F074 1px; color:#F07'>2-3</button>
+    <button onclick='send_card_to(4,7);'  class='control' style='border: solid #B0F4 1px; color:#B0F'>4-7</button>
+    <button onclick='send_card_to(-1);'   class='control' style='border: solid #60F4 1px; color:#60F'>???</button>
+    <button onclick='send_card_to(null);' class='control' style='border: solid #00F4 1px; color:blue'>Done</button>
+  </div>
+
+
+  <script src='tabletop.min.js'></script>
+  <script type='text/javascript'>    
+    var url = window.location.search; 
+    url = url.substr(1, url.length);
+    console.log(url);
+    if(url.substr(0,8) != 'https://') url = 'https://docs.google.com/spreadsheets/d/'+url+'/edit?usp=sharing';
+    console.log(url);
+
+    var cards=[];
+    var score=0;
+
+    function init() {
+      Tabletop.init( { key: url, callback: load_cards, simpleSheet: true } );
+    }
+
+    // Just converts the format to a list of 2-element lists, one for each card
+    function load_cards(data, tabletop) {
+      console.log(data);
+      cards = [];
+      var q, a;
+      for(var n in data) {
+        q = data[n][Object.keys(data[n])[0]];
+        a = data[n][Object.keys(data[n])[1]];
+        cards.push({q:q,a:a});
+      }
+
+      // Reset score
+      set_score(0);
+
+      // Show the top card
+      show_question();
+    }
+
+    // Update score
+    function set_score(n) {
+      score=n;
+      document.getElementById('score').innerHTML = 'Score: '+String(n);
+    }
+
+    // Returns a random integer from m to n
+    function random_integer(m,n) { 
+        var y = Math.floor(Math.random()*(1+n-m))+m; 
+
+        // exceedingly rare case
+        if(y > n) y = n;
+
+        return parseInt(y);
+    }
+    // randomizes the order of the supplied array (in place)
+    function shuffle_array(array) {
+      var currentIndex = array.length, temporaryValue, randomIndex ;
+
+      // While there remain elements to shuffle...
+      while (0 !== currentIndex) {
+
+        // Pick a remaining element...
+        var randomIndex = random_integer(0, currentIndex-1);
+        currentIndex -= 1;
+
+        // And swap it with the current element.
+        var temporaryValue = array[currentIndex];
+        array[currentIndex] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
+      }
+
+      return array;
+    }
+
+    // Shuffles the deck
+    function shuffle_cards() { console.log('shuffle_cards()');
+      cards = shuffle_array(cards);
+      set_score(0);
+      show_question();
+    }
+
+    // Sends the top card to index n. 0 means "bottom", undefined means "random > 2"
+    function send_card_to(n,m) { console.log('send_card_to()', n);
+      
+      // Get the top card
+      var top_card = cards.splice(0,1)[0];
+      
+      // Put it on the bottom of the deck.
+      if(n == null) {
+        cards.push(top_card);
+        set_score(score+20);
+      }
+
+      // Put it in a random place with index > 2
+      else if (n == -1) {
+        cards.splice(random_integer(1,cards.length), 0, top_card);
+        set_score(score+10);
+      }
+
+      // Put it at location n
+      else {
+        cards.splice(random_integer(n,m), 0, top_card);
+        set_score(score+parseInt(0.5*(n+m)));
+      }
+
+      // Show the top card
+      show_question();
+    }
+
+    // Displays the top card qestion & answer
+    function show_question() { console.log('show_question()');
+      if(cards[0]) {
+        document.getElementById('div-question').innerHTML = cards[0].q;
+        document.getElementById('div-answer')  .innerHTML = '&nbsp'
+      }
+    }
+    function show_answer() { console.log('show_answer()');
+      if(cards[0]) {
+        document.getElementById('div-answer').innerHTML = cards[0].a;
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', init);
+  </script>
+
+</body>
+
+</html>
