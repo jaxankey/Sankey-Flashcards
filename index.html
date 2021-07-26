@@ -72,7 +72,7 @@
       flex-grow: 1;
     }
 
-    button {
+    button, select{
       background-color:white;
       color: rgb(150, 150, 150);
       border: solid rgb(197, 197, 197) 1px;
@@ -93,6 +93,9 @@
 
 <body>
 
+  <div class='bottom_controls'>
+    <select onchange='load_cards();' id='select-sheet' style='margin-bottom:0; flex-grow: 1;'></select>
+  </div>
   <div class='top_controls'>
     <button onclick='shuffle_cards();'>Shuffle</button>
     <button onclick='flip_cards();'>Flip</button>
@@ -124,27 +127,104 @@
     if(url.substr(0,8) != 'https://') url = 'https://docs.google.com/spreadsheets/d/'+url+'/edit?usp=sharing';
     console.log(url);
 
+    var sheets;
     var cards=[];
     var score=0;
     var reverse=false;
 
+    // Saves a cookie
+    function save_cookie(key, value, expire_days) { console.log('save_cookie()', key, value);
+        if(expire_days==undefined) expire_days=28;
+
+        // get the expiration date
+        var d = new Date();
+        d.setTime(d.getTime() + (expire_days*24*60*60*1000));
+        
+        // now write the cookie string
+        document.cookie = "Sankey_Flashcards_"+key + '=' + value + '; expires=' + d.toUTCString() + '; SameSite=Lax';
+    }
+
+    // Returns the cookie value or undefined
+    function load_cookie(key) {
+        
+        // get a list of the cookie elements
+        var cs = document.cookie.split(';');
+
+        // Default is empty string
+        var value = null;
+
+        // Loop over elements to find the key
+        for(var i=0; i<cs.length; i++) {
+
+            // split by "=" sign
+            s = cs[i].split('=');
+
+            // strip white space
+            while (s[0].charAt(0)==' ') s[0] = s[0].substring(1);
+
+            // If it's our key
+            if(s[0] == 'Sankey_Flashcards_'+key) {
+                value = s[1];
+                break;
+            };
+        }
+
+        console.log('load_cookie()', key, value);
+        return value;
+    }
+
     function init() {
-      Tabletop.init( { key: url, callback: load_cards, simpleSheet: true } );
+      Tabletop.init( { key: url, callback: load_data}); //, simpleSheet: true } );
     }
 
     // Just converts the format to a list of 2-element lists, one for each card
-    function load_cards(data, tabletop) {
-      console.log(data);
+    function load_data(d, t) { 
+      
+      // Keep the sheets data for global use.
+      sheets = d; 
+      console.log(sheets);
+      
+      // Get the select object
+      var s = document.getElementById('select-sheet');
+      
+      // Add the new elements
+      for(var k in sheets) {
+        console.log(' ', k);
+        var o = document.createElement('option');
+        o.text = k;
+        s.add(o);
+      }
+      
+      // Load the cookie if it's there and set the selection
+      var c = load_cookie('select_sheet');
+      if(c != null) s.value = c;
+    
+      // Load the cards for this value
+      load_cards();
+    }
+
+    function load_cards() {
+
+      // Get the sheet key
+      var s = document.getElementById('select-sheet'); 
+      save_cookie('select_sheet', s.value);
+      
+      // Get the data for this sheet
+      var d = sheets[s.value].elements;
+      console.log('load_cards()', s.value, d.length);
+      
+      // Get the column keys from this sheet.
+      var qkey = Object.keys(d[0])[0];
+      var akey = Object.keys(d[0])[1];
+
+      // Clear the existing deck and refill it.
       cards = [];
       var q, a;
-      for(var n in data) {
-        q = data[n][Object.keys(data[n])[0]];
-        a = data[n][Object.keys(data[n])[1]];
+      for(var n in d) {
+        q = d[n][qkey];
+        a = d[n][akey];
         cards.push({q:q,a:a});
       }
-
-      // Reset score
-      set_score(0);
 
       // Show the top card
       show_question();
