@@ -1,5 +1,5 @@
-# Basic Sankey-Style Flashcards
-Turn any published google sheet into Sankey-style flashcards on any internet-connected device, and share your creation with an html link.
+# Simple Sankey-Style Flashcards
+Turn any published google sheet into Sankey-style flashcards and share your creation with an html link.
 
 # Getting Started
 
