@@ -1,5 +1,5 @@
-# Simple Sankey-Style Flashcards Web-App
-Turn any published google sheet into Sankey-style flashcards and share your creation with an html link.
+# Simple Sankey Flashcard Web-App
+Turn any published google sheet into Sankey flashcards and share your creation with an html link.
 
 # Linking the App to a Google Sheet
 
