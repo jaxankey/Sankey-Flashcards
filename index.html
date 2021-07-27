@@ -241,10 +241,11 @@
       
       // Load the cookie if it's there and set the selection
       var c = load_cookie('select_sheet');
+      console.log('  last sheet', c, ks);
       if(c != null && c in ks) s.value = c;
     
       // Also save the cookie so it stays at the original (sometimes the sheets come in reverse order!)
-      save_cookie('select_sheet', s.value);
+      //save_cookie('select_sheet', s.value);
 
       // Load the cards for this value
       load_cards();
