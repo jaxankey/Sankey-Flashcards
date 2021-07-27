@@ -1,4 +1,4 @@
-# Flashcard Web-App
+# Sankey's Method Flashcard Web-App
 Turn any published google sheet into flashcards and share your creation with an html link.
 
 # Linking the App to a Google Sheet
