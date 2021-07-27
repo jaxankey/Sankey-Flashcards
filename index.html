@@ -212,6 +212,12 @@
       // Get the data for this sheet
       var d = sheets[s.value].elements;
       console.log('load_cards()', s.value, d.length);
+
+      // If there is no deck
+      if(!d.length) {
+        document.getElementById('div-question').innerHTML = 'No cards?';
+        return
+      }
       
       // Get the column keys from this sheet.
       var qkey = Object.keys(d[0])[0];
@@ -307,16 +313,21 @@
 
     // Displays the top card qestion & answer
     function show_question() { console.log('show_question()');
+      var q = document.getElementById('div-question');
       if(cards[0]) {
-        if(reverse) document.getElementById('div-question').innerHTML = cards[0].a;
-        else        document.getElementById('div-question').innerHTML = cards[0].q;
+        if(reverse) q.innerHTML = cards[0].a;
+        else        q.innerHTML = cards[0].q;
+        if(q.innerHTML == '') q.innerHTML = '&nbsp'
+        
         document.getElementById('div-answer')  .innerHTML = '&nbsp'
       }
     }
     function show_answer() { console.log('show_answer()');
+      var a = document.getElementById('div-answer')
       if(cards[0]) {
-        if(reverse) document.getElementById('div-answer').innerHTML = cards[0].q;
-        else        document.getElementById('div-answer').innerHTML = cards[0].a;
+        if(reverse) a.innerHTML = cards[0].q;
+        else        a.innerHTML = cards[0].a;
+        if(a.innerHTML == '') a.innerHTML = '&nbsp'
       }
     }
 
