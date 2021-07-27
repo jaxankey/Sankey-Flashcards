@@ -1,4 +1,6 @@
 # A Google Sheets Flashcard Web-App
+![Screenshot](https://github.com/jaxankey/Sankey-Flashcards/raw/main/screenshot.png)
+
 Turn any published google sheet into Sankey-style flashcards on any device, and share your creation with a permanent html link.
 
 # Linking the App to a Google Sheet
@@ -8,8 +10,6 @@ Turn any published google sheet into Sankey-style flashcards on any device, and 
  3. Finish the process and return to the sheet itself, then copy its URL (or just the sheet id) from the browser's address bar, and paste this onto the end of the following URL: `https://jaxankey.github.io/Sankey-Flashcards/?`. See examples below.
 
 # App Usage
-
-![Screenshot](https://github.com/jaxankey/Sankey-Flashcards/raw/main/screenshot.png)
 
  * After loading, the app will show the "question" part of the first "card" (row 2, column A in your sheet). You can also tap `Shuffle` to shuffle the deck.
  * Tapping anywhere on the screen will reveal the "answer" (column B).
