@@ -12,10 +12,18 @@ Turn any published google sheet into Sankey-style flashcards on any device, and 
 
 # App Usage
 
- * After loading, the app will show the "question" from the first "card" (row 2, column A in your sheet). `Shuffle` will randomize the deck, `Flip` will reverse which column is used as the question, and `Edit` will take you to the Google Sheet.
- * Tapping the question or answer area will reveal the answer (column B).
- * Based on how well you did, you can choose how deep to move the card in the deck. The `Redo` button moves it 1 deep, the next buttons randomly move it to somewhere in the specified range, `???` moves it to a completely random location, and `Done` moves it to the bottom.
+### Basic Controls
+
+ * Tapping the upper (blue) question or lower (red) answer area will reveal the question or answer (columns A or B, respectively).
+ * Based on how well you did, choose how deep to move the card in the deck. The `Redo` button moves it 1 deep, the next buttons randomly move it to somewhere in the specified range, `???` moves it to a completely random location, and `Done` moves it to the bottom.
  * Your "score" will increase more depending on how deep you push each card. If you "play honestly", this can provide some sense of how well your "workout" is going. Tapping the score will reset it to zero.
+
+### Other Controls
+
+ * `Shuffle` will randomize the deck
+ * `Flip` will reverse questions and answers 
+ * `Edit` will take you to the Google Sheet
+ * Selecting anything other than `Silent` from the pull-down menus will cause the cards to be spoken (if speech synthesis is available on your browser).
 
 # The Method
 
