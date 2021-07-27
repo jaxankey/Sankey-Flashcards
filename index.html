@@ -95,13 +95,12 @@
 
   <div class='bottom_controls'>
     <select onchange='load_cards();' id='select-sheet' style='height: 1.92em; margin-bottom:0; flex-grow: 1;'></select>
+    <button onclick='shuffle_cards();' style='margin-bottom:0'>Shuffle</button>
+    <button onclick='flip_cards();' style='margin-bottom:0'>Flip</button>
     <button onclick='edit();' style='margin-bottom:0'>Edit</button>
   </div>
   <div class='top_controls'>
-    <button onclick='shuffle_cards();'>Shuffle</button>
-    <button onclick='flip_cards();'>Flip</button>
-    <button onclick='set_score(0);'>Reset</button>
-    <div class='score'><div id='score' class='center'>Score: 0</div></div>
+    <button id='score' onclick='set_score(0);' style='border: solid #0774 1px; color:#077; font-size: 1.2em; font-weight: normal; flex-grow: 1;'>Score: 0</button>
   </div>
   
   <a onclick='show_answer()' class='content'>
