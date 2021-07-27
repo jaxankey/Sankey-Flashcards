@@ -243,8 +243,14 @@
       var c = load_cookie('select_sheet');
       if(c != null && c in ks) s.value = c;
     
+      // Also save the cookie so it stays at the original (sometimes the sheets come in reverse order!)
+      save_cookie('select_sheet', s.value);
+
       // Load the cards for this value
       load_cards();
+
+      // If we're reversed, do this
+      if(load_cookie('reverse') == 'true') flip_cards();
     }
 
     function load_cards() {
