@@ -51,13 +51,13 @@
       margin-bottom: 3.5px;
       border: solid #00F4 1px;
       color:blue;
-      background-color: #F7F7FF;
+      background-color: #0000FF07;
     }
     .answer {
       margin-top: 3.5px;
       border: solid #F004 1px;
       color:red;
-      background-color: #FFF7F7;
+      background-color: #FF000007;
     }
 
     .center {
@@ -100,7 +100,7 @@
     <button onclick='edit();' style='margin-bottom:0'>Edit</button>
   </div>
   <div class='top_controls'>
-    <button id='score' onclick='set_score(0);' style='border: solid #0774 1px; color:#077; font-size:larger; flex-grow: 1;'>Score: 0</button>
+    <button id='score' onclick='set_score(0);' style='border: solid #0774 1px; color:#077; background-color: #00777707; font-size:larger; flex-grow: 1;'>Score: 0</button>
   </div>
   
   <a onclick='show_answer()' class='content'>
@@ -111,11 +111,11 @@
   </a>
 
   <div class='bottom_controls'>
-    <button onclick='send_card_to(1,1);'  class='control' style='border: solid #F004 1px; color:red'>Redo</button>
-    <button onclick='send_card_to(2,3);'  class='control' style='border: solid #F074 1px; color:#F07'>2-3</button>
-    <button onclick='send_card_to(4,7);'  class='control' style='border: solid #B0F4 1px; color:#B0F'>4-7</button>
-    <button onclick='send_card_to(-1);'   class='control' style='border: solid #60F4 1px; color:#60F'>???</button>
-    <button onclick='send_card_to(null);' class='control' style='border: solid #00F4 1px; color:blue'>Done</button>
+    <button onclick='send_card_to(1,1);'  class='control' style='background-color: #FF000007; border: solid #F004 1px; color:red'>Redo</button>
+    <button onclick='send_card_to(2,3);'  class='control' style='background-color: #FF007707;border: solid #F074 1px; color:#F07'>2-3</button>
+    <button onclick='send_card_to(4,7);'  class='control' style='background-color: #BB00FF07;border: solid #B0F4 1px; color:#B0F'>4-7</button>
+    <button onclick='send_card_to(-1);'   class='control' style='background-color: #7700FF07;border: solid #70F4 1px; color:#70F'>???</button>
+    <button onclick='send_card_to(null);' class='control' style='background-color: #0000FF07;border: solid #00F4 1px; color:blue'>Done</button>
   </div>
 
 
