@@ -188,7 +188,9 @@
       var s = document.getElementById('select-sheet');
       
       // Add the new elements
+      var ks = [];
       for(var k in sheets) {
+        ks.push(k);
         console.log(' ', k);
         var o = document.createElement('option');
         o.text = k;
@@ -197,7 +199,7 @@
       
       // Load the cookie if it's there and set the selection
       var c = load_cookie('select_sheet');
-      if(c != null) s.value = c;
+      if(c != null && c in ks) s.value = c;
     
       // Load the cards for this value
       load_cards();
