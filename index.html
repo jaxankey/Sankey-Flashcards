@@ -115,7 +115,7 @@
   <div class='content'>  
 
     <div><select id='select-qvoice' onchange='change_qvoice();' class='question voice'></select></div>
-    <div onclick='show_answer()' class='question'>
+    <div onclick='show_question()' class='question'>
       <div id='div-question' class='center'>Loading...</div>
     </div>
     
@@ -282,8 +282,8 @@
         cards.push({q:q,a:a});
       }
 
-      // Show the top card
-      show_question();
+      document.getElementById('div-question').innerHTML = '(tap to start)'
+
     }
 
     function flip_cards() {
