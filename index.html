@@ -353,13 +353,8 @@
     }
 
     // Sends the top card to index n. 0 means "bottom", undefined means "random > 2"
-    function send_card_to(n,m) { 
-      console.log('send_card_to()', n);
+    function send_card_to(n,m) { console.log('send_card_to()', n);
       
-      // Clear the divs
-      document.getElementById('div-question').innerHTML = '&nbsp'
-      document.getElementById('div-answer')  .innerHTML = '&nbsp'
-
       // Get the top card
       var top_card = cards.splice(0,1)[0];
       
@@ -404,6 +399,7 @@
         if(reverse) q.innerHTML = cards[0].a;
         else        q.innerHTML = cards[0].q;
         if(q.innerHTML == '') q.innerHTML = '&nbsp'
+        a.innerHTML = '&nbsp'
       }
 
       // And say it
