@@ -242,7 +242,7 @@
       // Load the cookie if it's there and set the selection
       var c = load_cookie('select_sheet');
       console.log('  last sheet', c, ks);
-      if(c != null && c in ks) {
+      if(c != null && ks.includes(c)) {
         console.log('  setting', c);
         s.value = c;
       }
