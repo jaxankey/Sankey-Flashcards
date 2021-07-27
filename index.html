@@ -94,7 +94,8 @@
 <body>
 
   <div class='bottom_controls'>
-    <select onchange='load_cards();' id='select-sheet' style='margin-bottom:0; flex-grow: 1;'></select>
+    <select onchange='load_cards();' id='select-sheet' style='height: 1.92em; margin-bottom:0; flex-grow: 1;'></select>
+    <button onclick='edit();' style='margin-bottom:0'>Edit</button>
   </div>
   <div class='top_controls'>
     <button onclick='shuffle_cards();'>Shuffle</button>
@@ -121,6 +122,7 @@
 
   <script src='tabletop.min.js'></script>
   <script type='text/javascript'>    
+    
     var url = window.location.search; 
     url = url.substr(1, url.length);
     console.log(url);
@@ -131,6 +133,9 @@
     var cards=[];
     var score=0;
     var reverse=false;
+
+    // Goes to the sheet to edit
+    function edit() {location.href=url;}
 
     // Saves a cookie
     function save_cookie(key, value, expire_days) { console.log('save_cookie()', key, value);
