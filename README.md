@@ -8,6 +8,9 @@ Turn any published google sheet into Sankey-style flashcards on any device, and 
  3. Finish the process and return to the sheet itself, then copy its URL (or just the sheet id) from the browser's address bar, and paste this onto the end of the following URL: `https://jaxankey.github.io/Sankey-Flashcards/?`. See examples below.
 
 # App Usage
+
+![Screenshot](https://github.com/jaxankey/Sankey-Flashcards/raw/main/screenshot.png)
+
  * After loading, the app will show the "question" part of the first "card" (row 2, column A in your sheet). You can also tap `Shuffle` to shuffle the deck.
  * Tapping anywhere on the screen will reveal the "answer" (column B).
  * Based on how well you did, you then decide how deep to push the card into the deck. The first button (`Redo`) will push it 1 deep, the next buttons push to a randomized range of depths, `???` will push it to a random location in the whole deck, and `Done` will push it to the bottom.
