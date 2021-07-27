@@ -1,5 +1,5 @@
-# Sankey's Method Flashcard Web-App
-Turn any published google sheet into flashcards and share your creation with an html link.
+# A Google Sheets Flashcard Web-App
+Turn any published google sheet into Sankey-style flashcards on any device, and share your creation with an html link.
 
 # Linking the App to a Google Sheet
 
