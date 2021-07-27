@@ -1,4 +1,4 @@
-![Screenshot](https://github.com/jaxankey/Sankey-Flashcards/raw/main/screenshot.png)
+<p align="center"><img src="https://github.com/jaxankey/Sankey-Flashcards/raw/main/screenshot.png"></p>
 
 # A Google Sheets Flashcard Web-App
 
