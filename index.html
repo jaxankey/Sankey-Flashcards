@@ -259,6 +259,7 @@
       if(load_cookie('reverse') == 'true') flip_cards();
     }
 
+    // Loads the cards for the selected sheet
     function load_cards() {
 
       // Get the sheet key
@@ -285,7 +286,9 @@
       for(var n in d) {
         q = d[n][qkey];
         a = d[n][akey];
-        cards.push({q:q,a:a});
+
+        // Ignore empty rows
+        if(q != '' || a != '') cards.push({q:q,a:a});
       }
 
       // Reset the number of cards remaining to practice
