@@ -133,7 +133,7 @@
     <button onclick='send_card_to(1,1);'  class='control' style='border: solid #F004 1px; color:red'>Redo</button>
     <button onclick='send_card_to(2,3);'  class='control' style='border: solid #F074 1px; color:#F07'>2-3</button>
     <button onclick='send_card_to(4,7);'  class='control' style='border: solid #B0F4 1px; color:#B0F'>4-7</button>
-    <button onclick='send_card_to(-1);'   class='control' style='border: solid #70F4 1px; color:#70F'>???</button>
+    <button onclick='send_card_to(8);'    class='control' style='border: solid #70F4 1px; color:#70F'>8-?</button>
     <button onclick='send_card_to(null);' class='control' style='border: solid #00F4 1px; color:blue'>Done</button>
   </div>
 
@@ -366,7 +366,7 @@
 
     // Sends the top card to index n. 0 means "bottom", undefined means "random > 2"
     function send_card_to(n,m) { 
-      console.log('send_card_to()', n);
+      console.log('send_card_to()', n, m);
       
       // Get the top card
       var top_card = cards.splice(0,1)[0];
@@ -381,6 +381,12 @@
       // Put it in a random place up to the remaining cards (don't stick it in with the "done" cards)
       else if (n == -1) {
         cards.splice(random_integer(1,cards_remaining-1), 0, top_card);
+        set_score(score+10);
+      }
+
+      // Put it at least a certain depth
+      else if (m == undefined) {
+        cards.splice(random_integer(n, cards_remaining-1), 0, top_card);
         set_score(score+10);
       }
 
