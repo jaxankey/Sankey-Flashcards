@@ -29,7 +29,7 @@ Turn any published google sheet into Sankey-style flashcards on any device, and 
 
 ## The Method
 
-For a given card, I recommend starting with `Redo` until the card feels automatic, and then progressively upgrading the depth every time it becomes automatic again. Note cards will often regress back to "difficult", so expect to downgrade often throughout the process. 
+If you get a card wrong or have difficulty, tap `Redo` until it feels automatic, and then progressively upgrading the depth, waiting at each stage until it again becomes automatic. When it's automatic a few times at a high depth, you can use `Done` to remove it from the loop. Note cards *will* often regress back to "difficult", so expect to downgrade often throughout the process. 
 
 ## Examples
  * [Math Drills Google Sheet](https://docs.google.com/spreadsheets/d/1IfWy8aefe9aNUO3OJ2bKv2Vtb28eEx2XUfMyYPiZv8c/)
