@@ -28,7 +28,12 @@
 
     .score {
       padding-left: 0.2em;
-      font-weight: bold;
+      font-weight: normal;
+      border: solid #0774 1px; 
+      color:#077; 
+      font-size: 1.1em; 
+      background-color: #00777707; 
+      flex-grow: 1;
     }
 
     .content {
@@ -107,8 +112,8 @@
     <button onclick='edit();' style='margin-bottom:0'>Edit</button>
   </div>
   <div class='top_controls'>
-    <button id='score'     onclick='set_score(0);'    style='border: solid #0774 1px; color:#077; font-size: 1.1em; background-color: #00777707; flex-grow: 1;'>Score: 0</button>
-    <button id='remaining' onclick='set_remaining();' style='border: solid #0774 1px; color:#077; font-size: 1.1em; background-color: #00777707; flex-grow: 1;'>Remaining: 0</button>
+    <button id='score'     class='score' onclick='set_score(0);'    >Score: 0</button>
+    <button id='remaining' class='score' onclick='set_remaining();' >Remaining: 0</button>
   </div>
   
   <div class='content'>  
