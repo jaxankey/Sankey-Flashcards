@@ -8,22 +8,24 @@ Turn any published google sheet into Sankey-style flashcards on any device, and 
 
  1. Create a [Google Sheets](https://docs.google.com/spreadsheets/u/0/) document with a column for questions and a column for answers. The first row will be ignored, so you can use this as a column label. Add a few entries to play with.
  2. Select `File` -> `Publish to the web`, select the desired sheets and `Comma-separated values (.csv)'`, then push the green `Publish` button.
- 3. Finish the process and return to the sheet itself, then copy its URL (or just the sheet id) from the browser's address bar, and paste this onto the end of the following URL: `https://jaxankey.github.io/Sankey-Flashcards/?`. See examples below.
+ 3. Finish the process and return to the sheet, then copy its URL (or just the sheet id) from the browser's address bar, and paste this onto the end of the following URL: `https://jaxankey.github.io/Sankey-Flashcards/?`. See examples below.
 
 ## App Usage
 
 ### Basic Controls
 
  * Tapping the upper (blue) question or lower (red) answer area will reveal the question or answer (columns A or B, respectively).
- * Based on how well you did, choose how deep to move the card in the deck. The `Redo` button moves it 1 deep, the next buttons randomly move it to somewhere in the specified range, `???` moves it to a completely random location, and `Done` moves it to the bottom.
- * Your "score" will increase more depending on how deep you push each card. If you "play honestly", this can provide some sense of how well your "workout" is going. Tapping the score will reset it to zero.
+ * Based on how well you did, choose how deep to move the card in the remaining cards. The `Redo` button moves it 1 deep, the next buttons randomly move it to somewhere in the specified range, `???` moves it to a completely random location, and `Done` removes the card from the deck (just for the session).
+ * Your "score" will increase more depending on how deep you push each card. If you "play honestly", this can provide some sense of how well your "workout" is going. 
 
 ### Other Controls
 
  * `Shuffle` will randomize the deck
  * `Flip` will reverse questions and answers 
  * `Edit` will take you to the Google Sheet
- * Selecting anything other than `Silent` from the pull-down menus will cause the cards to be spoken (if speech synthesis is available on your browser).
+ * Tapping the `Score` area will reset it to zero.
+ * Tapping the `Remaining` area will re-add all the cards previously marked `Done`.
+ * The pull-down menus above the question and answer areas (`Silent` by default) will select a spoken language (if speech synthesis is available on your browser).
 
 ## The Method
 
