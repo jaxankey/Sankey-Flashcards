@@ -1,6 +1,4 @@
-<html>
-
-<head>
+<html><head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -42,7 +40,7 @@
     .question, .answer {
       flex-grow: 1;
       text-align: center;
-      font-size: 2.5em;
+      font-size: 2.0em;
       margin-left: 7px;
       margin-right: 7px;
       background-color: white;
@@ -109,7 +107,8 @@
     <button onclick='edit();' style='margin-bottom:0'>Edit</button>
   </div>
   <div class='top_controls'>
-    <button id='score' onclick='set_score(0);' style='border: solid #0774 1px; color:#077; font-size: 1.1em; background-color: #00777707; flex-grow: 1;'>Score: 0</button>
+    <button id='score'     onclick='set_score(0);'    style='border: solid #0774 1px; color:#077; font-size: 1.1em; background-color: #00777707; flex-grow: 1;'>Score: 0</button>
+    <button id='remaining' onclick='set_remaining();' style='border: solid #0774 1px; color:#077; font-size: 1.1em; background-color: #00777707; flex-grow: 1;'>Remaining: 0</button>
   </div>
   
   <div class='content'>  
@@ -146,6 +145,7 @@
     var sheets;
     var cards=[];
     var score=0;
+    var cards_remaining=0; // Number of not-"done" cards remaining.
     var reverse=false;
     var select_qvoice = document.getElementById('select-qvoice');
     var select_avoice = document.getElementById('select-avoice');
@@ -154,8 +154,7 @@
     o = document.createElement('option'); o.text = 'Silent'; select_qvoice.add(o);
     o = document.createElement('option'); o.text = 'Silent'; select_avoice.add(o);
     var langs = [];
-    var utterance = undefined;
-
+    
     // Check for language support
     if(speechSynthesis) {
       langs = ["de-DE", "en-US", "en-GB", "es-ES", "es-US", "fr-FR", "hi-IN", "id-ID", "it-IT", "ja-JP", "ko-KR", "nl-NL", "pl-PL", "pt-BR", "ru-RU", "zh-CN", "zh-HK", "zh-TW"];
@@ -163,13 +162,11 @@
         o = document.createElement('option'); o.text = langs[k]; select_qvoice.add(o);
         o = document.createElement('option'); o.text = langs[k]; select_avoice.add(o);
       }
-      utterance = new SpeechSynthesisUtterance();
-
+      
       // Load the cookie
       var x = load_cookie('select_qvoice'); if(x) select_qvoice.value = x;
       x     = load_cookie('select_avoice'); if(x) select_avoice.value = x;
     }
-
 
     // Goes to the sheet to edit
     function edit() {location.href=url;}
@@ -286,8 +283,11 @@
         cards.push({q:q,a:a});
       }
 
-      document.getElementById('div-question').innerHTML = 'tap to start'
+      // Reset the number of cards remaining to practice
+      set_remaining(cards.length);
 
+      // Show the top card
+      show_question();
     }
 
     function flip_cards() {
@@ -305,6 +305,13 @@
     function set_score(n) {
       score=n;
       document.getElementById('score').innerHTML = 'Score: '+String(n);
+    }
+
+    // Update the cards remaining
+    function set_remaining(n) {
+      if(n == undefined) n = cards.length;
+      cards_remaining = n;
+      document.getElementById('remaining').innerHTML = 'Remaining: '+String(n);
     }
 
     // Returns a random integer from m to n
@@ -353,7 +360,8 @@
     }
 
     // Sends the top card to index n. 0 means "bottom", undefined means "random > 2"
-    function send_card_to(n,m) { console.log('send_card_to()', n);
+    function send_card_to(n,m) { 
+      console.log('send_card_to()', n);
       
       // Get the top card
       var top_card = cards.splice(0,1)[0];
@@ -361,18 +369,20 @@
       // Put it on the bottom of the deck.
       if(n == null) {
         cards.push(top_card);
+        set_remaining(cards_remaining-1);
         set_score(score+20);
       }
 
-      // Put it in a random place with index > 2
+      // Put it in a random place up to the remaining cards (don't stick it in with the "done" cards)
       else if (n == -1) {
-        cards.splice(random_integer(1,cards.length), 0, top_card);
+        cards.splice(random_integer(1,cards_remaining-1), 0, top_card);
         set_score(score+10);
       }
 
       // Put it at location n
       else {
-        cards.splice(random_integer(n,m), 0, top_card);
+        var x = random_integer(n,m);
+        cards.splice(Math.min(x,cards_remaining-1), 0, top_card);
         set_score(score+parseInt(0.5*(n+m)));
       }
 
@@ -383,7 +393,9 @@
     // Speaks the supplied div's html in the supplied language
     function speak(qa, lang) {
       if(lang != 'Silent') {
+        var utterance = new SpeechSynthesisUtterance();
         utterance.lang = lang;
+        //utterance.voice = speechSynthesis.getVoices()[3];
         utterance.text = qa.innerText;
         window.speechSynthesis.speak(utterance);
       }
@@ -394,8 +406,14 @@
       var q = document.getElementById('div-question');
       var a = document.getElementById('div-answer')  
       
-      // Show it
-      if(cards[0]) {
+      // If it's zero, we show a special card
+      if(cards_remaining<=0) {
+        q.innerHTML = 'All done!'
+        a.innerHTML = '(tap to begin)'
+      }
+      
+      // Otherwise show the top card
+      else if(cards[0]) {
         if(reverse) q.innerHTML = cards[0].a;
         else        q.innerHTML = cards[0].q;
         if(q.innerHTML == '') q.innerHTML = '&nbsp'
@@ -411,11 +429,17 @@
       var q = document.getElementById('div-question');
       var a = document.getElementById('div-answer')  
       
-      // Show it
-      if(cards[0]) {
+      // Special case, we're done!
+      if(cards_remaining<=0) {
+        set_remaining(cards.length);
+        show_question();
+      }
+
+      // Otherwise proceed
+      else if(cards[0]) {
         if(reverse) a.innerHTML = cards[0].q;
         else        a.innerHTML = cards[0].a;
-        if(a.innerHTML == '') a.innerHTML = '&nbsp'
+        if(a.innerHTML == '') a.innerHTML = '&nbsp';
       }
 
       // And say it
@@ -425,6 +449,4 @@
     window.addEventListener('DOMContentLoaded', init);
   </script>
 
-</body>
-
-</html>
+</body></html>
