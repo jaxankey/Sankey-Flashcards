@@ -15,7 +15,7 @@ Turn any published google sheet into Sankey-style flashcards on any device, and 
 ### Basic Controls
 
  * Tapping the upper (blue) question or lower (red) answer area will reveal the question or answer (columns A or B, respectively).
- * Based on how well you did, choose how deep to move the card in the remaining cards. The `Redo` button moves it 1 deep, the next buttons randomly move it to somewhere in the specified range, `???` moves it to a completely random location, and `Done` removes the card from the deck (just for the session).
+ * Based on how well you did, choose how deep to move the card in the remaining cards. The `Redo` button moves it 1 deep, the next buttons randomly move it to somewhere in the specified range, `8-?` moves it to a random depth 8 or higher, and `Done` removes the card from the deck (just for the session).
  * Your "score" will increase more depending on how deep you push each card. If you "play honestly", this can provide some sense of how well your "workout" is going. 
 
 ### Other Controls
