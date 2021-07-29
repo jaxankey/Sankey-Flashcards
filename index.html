@@ -105,6 +105,7 @@
 
 <body>
 
+
   <div class='bottom_controls'>
     <select onchange='load_cards();' id='select-sheet' style='margin-bottom:0; flex-grow: 1;'></select>
     <button onclick='shuffle_cards();' style='margin-bottom:0'>Shuffle</button>
@@ -134,6 +135,10 @@
         <option value='3000'>3 sec</option>
         <option value='5000'>5 sec</option>
         <option value='10000'>10 sec</option>
+      </select>
+      <select id='select-mode' class='answer voice' onchange="save_cookie('select_mode', this.value);">
+        <option value='normal'>Normal</option>
+        <option value='auto'>Auto</option>
       </select>
     </div>
     <div onclick='show_answer()' class='answer'  >
@@ -167,8 +172,14 @@
     var reverse=false;     // Whether we show the answer first
     var select_qvoice = document.getElementById('select-qvoice');
     var select_avoice = document.getElementById('select-avoice');
-    var answer_timer = false; // timeout object created if we're timing stuff.
+    var timer_answer    = false; // timeout object created if we're timing stuff.
+    var timer_send_card = false; // timeout object while we show the answer before sending it.
+    var t_delay_ms = 0;       // Delay setting
+    var t_question_ms = 0;    // Time the question was asked
 
+    var sound_correct = new Audio('correct.ogg');
+    var sound_done    = new Audio('done.ogg');
+    
     // Add the "No voice" entry
     o = document.createElement('option'); o.text = 'Silent'; select_qvoice.add(o);
     o = document.createElement('option'); o.text = 'Silent'; select_avoice.add(o);
@@ -177,8 +188,9 @@
                  "ko-KR", "nl-NL", "pl-PL", "pt-BR", "ru-RU", 
                  "zh-CN", "zh-HK", "zh-TW"];
     
-    // Load the timeout value
+    // Load the timeout value and mode
     var x = load_cookie('select_delay'); if(x) document.getElementById('select-delay').value = x;
+    x     = load_cookie('select_mode');  if(x) document.getElementById('select-mode' ).value = x;
 
     // Check for language support
     if(speechSynthesis) {
@@ -307,7 +319,7 @@
         a = d[n][akey];
 
         // Ignore empty rows
-        if(q != '' || a != '') cards.push({q:q,a:a});
+        if(q != '' || a != '') cards.push({q:q,a:a,wins:0});
       }
 
       // Reset the number of cards remaining to practice
@@ -389,27 +401,49 @@
     // Sends the top card to index n. 0 means "bottom", undefined means "random > 2"
     function send_card_to(n,m) { 
       console.log('send_card_to()', n, m);
+
+      // Clear the timer if it exists
+      if(timer_send_card) clearTimeout(timer_send_card);
       
       // Get the top card
       var top_card = cards.splice(0,1)[0];
+
+      // Find out if we're in auto mode
+      auto = document.getElementById('select-mode').value == 'auto';
       
       // Put it on the bottom of the deck.
+      if(n == null && auto) {
+        
+        // This is considered a win. in auto mode, we count how many wins (fast responses) there are in a row, 
+        // otherwise we set to the highest level
+
+        // Increment the wins
+        top_card.wins++; console.log('  consecutive wins:', top_card.wins);
+        
+        // If it's not bigger than the required number, recycle it
+        if(top_card.wins < 3) {n = 8; m = undefined;}
+
+        else sound_done.play();
+      }
+      
+      // If it's still null, do the usual send to bottom
       if(n == null) {
+        // JACK: Add an animation to the score? or a nice sound?
+        console.log('  pushing to bottom...');
         cards.push(top_card);
         set_remaining(cards_remaining-1);
         set_score(score+20);
-      }
 
-      // Put it in a random place up to the remaining cards (don't stick it in with the "done" cards)
-      else if (n == -1) {
-        cards.splice(random_integer(1,cards_remaining-1), 0, top_card);
-        set_score(score+10);
+        // Reset the wins
+        top_card.wins = 0;
       }
 
       // Put it at least a certain depth
       else if (m == undefined) {
         cards.splice(random_integer(n, cards_remaining-1), 0, top_card);
         set_score(score+10);
+
+        // Do not reset the wins for this highest setting.
       }
 
       // Put it at location n
@@ -417,6 +451,9 @@
         var x = random_integer(n,m);
         cards.splice(Math.min(x,cards_remaining-1), 0, top_card);
         set_score(score+parseInt(0.5*(n+m)));
+
+        // This is a loss
+        top_card.wins = 0;
       }
 
       // Show the top card
@@ -454,8 +491,9 @@
       }
 
       // Delay the show
-      var t_ms = parseInt(document.getElementById('select-delay').value);
-      if(t_ms) answer_timer = setTimeout(show_answer, t_ms, );
+      t_question_ms = Date.now();
+      t_delay_ms = parseInt(document.getElementById('select-delay').value);
+      if(t_delay_ms) timer_answer = setTimeout(show_answer, t_delay_ms);
 
       // And say it
       speak(q, select_qvoice.value);
@@ -465,8 +503,8 @@
     function show_answer() { console.log('show_answer()');
 
       // If we're waiting to show, cancel the timer.
-      if(answer_timer) clearTimeout(answer_timer);
-      answer_timer = false;
+      if(timer_answer) clearTimeout(timer_answer);
+      timer_answer = false;
     
       // Get the divs containing the data
       var q = document.getElementById('div-question');
@@ -487,6 +525,21 @@
 
       // And say it
       speak(a, select_avoice.value);
+
+      // In auto mode, decide where to put the card based on the time of the answer
+      if(document.getElementById('select-mode').value == 'auto') {
+        var r = (Date.now()-t_question_ms)/t_delay_ms;
+        if      (r >= 0.99) timer_send_card = setTimeout(send_card_to, Math.min(3000, t_delay_ms), 1,1);
+        else if (r >= 0.70) timer_send_card = setTimeout(send_card_to, Math.min(3000, t_delay_ms), 2,3);
+        else if (r >= 0.40) timer_send_card = setTimeout(send_card_to, Math.min(3000, t_delay_ms), 4,7);
+        else if (r >= 0.30) timer_send_card = setTimeout(send_card_to, Math.min(3000, t_delay_ms), 8);
+        
+        // If we're fast, we have to 
+        else {
+          sound_correct.play();
+          timer_send_card = setTimeout(send_card_to, Math.min(3000, t_delay_ms), null);
+        }
+      }
     }
 
     window.addEventListener('DOMContentLoaded', init);
