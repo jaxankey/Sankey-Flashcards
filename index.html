@@ -123,7 +123,19 @@
       <div id='div-question' class='center'>Loading...</div>
     </div>
     
-    <div><select id='select-avoice' onchange='change_avoice();' class='answer voice'></select></div>
+    <div>
+      <select id='select-avoice' onchange='change_avoice();' class='answer voice'></select>
+      <select id='select-delay'  class='answer voice' onchange="save_cookie('select_delay', this.value);">
+        <option value='0'>&#8734;</option>
+        <option value='250'>1/4 sec</option>
+        <option value='500'>1/2 sec</option>
+        <option value='1000'>1 sec</option>
+        <option value='2000'>2 sec</option>
+        <option value='3000'>3 sec</option>
+        <option value='5000'>5 sec</option>
+        <option value='10000'>10 sec</option>
+      </select>
+    </div>
     <div onclick='show_answer()' class='answer'  >
       <div id='div-answer'   class='center'>&nbsp;</div>
     </div>
@@ -147,22 +159,29 @@
     if(url.substr(0,8) != 'https://') url = 'https://docs.google.com/spreadsheets/d/'+url+'/edit?usp=sharing';
     console.log(url);
 
-    var sheets;
-    var cards=[];
-    var score=0;
+    // Sorry for the globals. This project got bigger than I thought, and I can't be bothered to class it up.
+    var sheets;            // Handle on the sheets data
+    var cards=[];          // List of card objects
+    var score=0;           // Score
     var cards_remaining=0; // Number of not-"done" cards remaining.
-    var reverse=false;
+    var reverse=false;     // Whether we show the answer first
     var select_qvoice = document.getElementById('select-qvoice');
     var select_avoice = document.getElementById('select-avoice');
+    var answer_timer = false; // timeout object created if we're timing stuff.
 
     // Add the "No voice" entry
     o = document.createElement('option'); o.text = 'Silent'; select_qvoice.add(o);
     o = document.createElement('option'); o.text = 'Silent'; select_avoice.add(o);
-    var langs = [];
+    var langs = ["de-DE", "en-US", "en-GB", "es-ES", "es-US", 
+                 "fr-FR", "hi-IN", "id-ID", "it-IT", "ja-JP", 
+                 "ko-KR", "nl-NL", "pl-PL", "pt-BR", "ru-RU", 
+                 "zh-CN", "zh-HK", "zh-TW"];
     
+    // Load the timeout value
+    var x = load_cookie('select_delay'); if(x) document.getElementById('select-delay').value = x;
+
     // Check for language support
     if(speechSynthesis) {
-      langs = ["de-DE", "en-US", "en-GB", "es-ES", "es-US", "fr-FR", "hi-IN", "id-ID", "it-IT", "ja-JP", "ko-KR", "nl-NL", "pl-PL", "pt-BR", "ru-RU", "zh-CN", "zh-HK", "zh-TW"];
       for(var k in langs) {
         o = document.createElement('option'); o.text = langs[k]; select_qvoice.add(o);
         o = document.createElement('option'); o.text = langs[k]; select_avoice.add(o);
@@ -434,12 +453,22 @@
         a.innerHTML = '&nbsp'
       }
 
+      // Delay the show
+      var t_ms = parseInt(document.getElementById('select-delay').value);
+      if(t_ms) answer_timer = setTimeout(show_answer, t_ms, );
+
       // And say it
       speak(q, select_qvoice.value);
     }
 
     // Show the answer and say it.
     function show_answer() { console.log('show_answer()');
+
+      // If we're waiting to show, cancel the timer.
+      if(answer_timer) clearTimeout(answer_timer);
+      answer_timer = false;
+    
+      // Get the divs containing the data
       var q = document.getElementById('div-question');
       var a = document.getElementById('div-answer')  
       
