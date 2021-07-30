@@ -126,7 +126,7 @@
     
     <div>
       <select id='select-avoice' onchange='change_avoice();' class='answer voice'></select>
-      <select id='select-delay'  class='answer voice' onchange="save_cookie('select_delay', this.value);">
+      <select id='select-delay'  class='answer voice' onchange="save_cookie('select_delay', this.value); show_question();">
         <option value='0'>&#8734;</option>
         <option value='250'>1/4 sec</option>
         <option value='500'>1/2 sec</option>
@@ -139,7 +139,7 @@
         <option value='10000'>10 sec</option>
         <option value='15000'>15 sec</option>
       </select>
-      <select id='select-mode' class='answer voice' onchange="save_cookie('select_mode', this.value);">
+      <select id='select-mode' class='answer voice' onchange="save_cookie('select_mode', this.value); show_question();">
         <option value='normal'>Normal</option>
         <option value='auto'>Auto</option>
       </select>
@@ -182,6 +182,7 @@
     var t_delay_ms = 0;       // Delay setting
     var t_question_ms = 0;    // Time the question was asked
 
+    var sound_maintain = new Audio('maintain.ogg');
     var sound_correct = new Audio('correct.ogg');
     var sound_done    = new Audio('done.ogg');
     
@@ -508,13 +509,16 @@
         
         // If we time out, downgrade
         if(r > 0.999) { c.level = Math.max(1, c.level-1); }
-        
+
         // If we're fast, upgrade and make a happy noise
         else if (r < 0.34) { 
           c.level = Math.min(c.level+1, 5); 
           if(c.level >= 5) sound_done.play();
           else             sound_correct.play();
         }
+
+        // Maintain
+        else sound_maintain.play();
         
         // Light the button for a moment
         var b = document.getElementById('send'+String(c.level));
