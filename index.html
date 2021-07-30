@@ -147,17 +147,19 @@
   </div>
 
   <div class='bottom_controls'>
-    <button onclick='send_card_to(1,1);'  class='control' style='border: solid #F004 1px; color:red'>Redo</button>
-    <button onclick='send_card_to(2,3);'  class='control' style='border: solid #F074 1px; color:#F07'>2-3</button>
-    <button onclick='send_card_to(4,7);'  class='control' style='border: solid #B0F4 1px; color:#B0F'>4-7</button>
-    <button onclick='send_card_to(8);'    class='control' style='border: solid #70F4 1px; color:#70F'>8-?</button>
-    <button onclick='send_card_to(null);' class='control' style='border: solid #00F4 1px; color:blue'>Done</button>
+    <button id='send1' onclick='send_card_to_level(1);' class='control' style='border: solid #F004 1px; color:red'>Redo</button>
+    <button id='send2' onclick='send_card_to_level(2);' class='control' style='border: solid #F074 1px; color:#F07'>2-3</button>
+    <button id='send3' onclick='send_card_to_level(3);' class='control' style='border: solid #B0F4 1px; color:#B0F'>4-7</button>
+    <button id='send4' onclick='send_card_to_level(4);' class='control' style='border: solid #70F4 1px; color:#70F'>8-?</button>
+    <button id='send5' onclick='send_card_to_level(5);' class='control' style='border: solid #00F4 1px; color:blue'>Done</button>
   </div>
 
 
   <script src='tabletop.min.js'></script>
   <script type='text/javascript'>    
     
+    var button_colors = ['#F00', '#F07', '#B0F', '#70F', '#00F'];
+
     var url = window.location.search; 
     url = url.substr(1, url.length);
     console.log(url);
@@ -319,7 +321,7 @@
         a = d[n][akey];
 
         // Ignore empty rows
-        if(q != '' || a != '') cards.push({q:q,a:a,wins:0});
+        if(q != '' || a != '') cards.push({q:q,a:a,level:1});
       }
 
       // Reset the number of cards remaining to practice
@@ -347,7 +349,7 @@
     }
 
     // Update the cards remaining
-    function set_remaining(n) {
+    function set_remaining(n) { console.log('set_remaining()', n);
       if(n == undefined) n = cards.length;
       cards_remaining = n;
       document.getElementById('remaining').innerHTML = 'Remaining: '+String(n);
@@ -399,61 +401,27 @@
     }
 
     // Sends the top card to index n. 0 means "bottom", undefined means "random > 2"
-    function send_card_to(n,m) { 
-      console.log('send_card_to()', n, m);
+    function send_card_to_level(n) { 
+      console.log('send_card_to_level()', n);
 
-      // Clear the timer if it exists
+      // Clear the timer if it exists, to avoid double-calls
       if(timer_send_card) clearTimeout(timer_send_card);
       
       // Get the top card
-      var top_card = cards.splice(0,1)[0];
+      var c = cards.splice(0,1)[0];
 
-      // Find out if we're in auto mode
-      auto = document.getElementById('select-mode').value == 'auto';
-      
-      // Put it on the bottom of the deck.
-      if(n == null && auto) {
-        
-        // This is considered a win. in auto mode, we count how many wins (fast responses) there are in a row, 
-        // otherwise we set to the highest level
+      // Button levels
+      if     (n <= 1) { set_score(score+1);  cards.splice(1, 0, c); }
+      else if(n == 2) { set_score(score+2);  cards.splice(random_integer(2,Math.min(3,cards_remaining-1)), 0, c);}
+      else if(n == 3) { set_score(score+5);  cards.splice(random_integer(4,Math.min(7,cards_remaining-1)), 0, c);}
+      else if(n == 4) { set_score(score+10); cards.splice(random_integer(8,           cards_remaining-1 ), 0, c);}
+      else            { set_score(score+20); cards.push(c); set_remaining(cards_remaining-1);}
 
-        // Increment the wins
-        top_card.wins++; console.log('  consecutive wins:', top_card.wins);
-        
-        // If it's not bigger than the required number, recycle it
-        if(top_card.wins < 3) {n = 8; m = undefined;}
-
-        else sound_done.play();
-      }
-      
-      // If it's still null, do the usual send to bottom
-      if(n == null) {
-        // JACK: Add an animation to the score? or a nice sound?
-        console.log('  pushing to bottom...');
-        cards.push(top_card);
-        set_remaining(cards_remaining-1);
-        set_score(score+20);
-
-        // Reset the wins
-        top_card.wins = 0;
-      }
-
-      // Put it at least a certain depth
-      else if (m == undefined) {
-        cards.splice(random_integer(n, cards_remaining-1), 0, top_card);
-        set_score(score+10);
-
-        // Do not reset the wins for this highest setting.
-      }
-
-      // Put it at location n
-      else {
-        var x = random_integer(n,m);
-        cards.splice(Math.min(x,cards_remaining-1), 0, top_card);
-        set_score(score+parseInt(0.5*(n+m)));
-
-        // This is a loss
-        top_card.wins = 0;
+      // Clear any button highlights
+      for(var i=1; i<=5; i++) {
+        var b = document.getElementById('send'+String(i));
+        b.style.transition = 'background-color 0.5s';
+        b.style.setProperty('background-color', button_colors[i-1]+'0');
       }
 
       // Show the top card
@@ -527,18 +495,31 @@
       speak(a, select_avoice.value);
 
       // In auto mode, decide where to put the card based on the time of the answer
-      if(document.getElementById('select-mode').value == 'auto') {
-        var r = (Date.now()-t_question_ms)/t_delay_ms;
-        if      (r >= 0.99) timer_send_card = setTimeout(send_card_to, Math.min(3000, t_delay_ms), 1,1);
-        else if (r >= 0.70) timer_send_card = setTimeout(send_card_to, Math.min(3000, t_delay_ms), 2,3);
-        else if (r >= 0.40) timer_send_card = setTimeout(send_card_to, Math.min(3000, t_delay_ms), 4,7);
-        else if (r >= 0.30) timer_send_card = setTimeout(send_card_to, Math.min(3000, t_delay_ms), 8);
+      if(document.getElementById('select-mode').value == 'auto' && t_delay_ms) {
         
-        // If we're fast, we have to 
-        else {
-          sound_correct.play();
-          timer_send_card = setTimeout(send_card_to, Math.min(3000, t_delay_ms), null);
+        // Get the card
+        var c = cards[0];
+
+        // Get the fractional time it took to answer
+        var r = (Date.now()-t_question_ms)/t_delay_ms;
+        
+        // If we time out, downgrade
+        if(r > 0.999) { c.level = Math.max(1, c.level-1); }
+        
+        // If we're fast, upgrade and make a happy noise
+        else if (r < 0.34) { 
+          c.level = Math.min(c.level+1, 5); 
+          if(c.level >= 5) sound_done.play();
+          else             sound_correct.play();
         }
+        
+        // Light the button for a moment
+        var b = document.getElementById('send'+String(c.level));
+        b.style.transition = 'background-color 0.1s';
+        b.style.setProperty('background-color', button_colors[c.level-1]+'3');        
+
+        // Send it
+        timer_send_card = setTimeout(send_card_to_level, Math.min(3000, t_question_ms), c.level);
       }
     }
 
