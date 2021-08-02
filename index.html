@@ -159,14 +159,15 @@
     <button id='send2' onclick='send_card_to_level(2);' class='control' style='border: solid #F074 1px; color:#F07'>2-3</button>
     <button id='send3' onclick='send_card_to_level(3);' class='control' style='border: solid #B0F4 1px; color:#B0F'>4-7</button>
     <button id='send4' onclick='send_card_to_level(4);' class='control' style='border: solid #70F4 1px; color:#70F'>8-?</button>
-    <button id='send5' onclick='send_card_to_level(5);' class='control' style='border: solid #00F4 1px; color:blue'>Done</button>
+    <button id='send5' onclick='send_card_to_level(5);' class='control' style='border: solid #40F4 1px; color:#40F'>?</button>
+    <button id='send0' onclick='send_card_to_level(0);' class='control' style='border: solid #00F4 1px; color:blue'>Done</button>
   </div>
 
 
   <script src='tabletop.min.js'></script>
   <script type='text/javascript'>    
     
-    var button_colors = ['#F00', '#F07', '#B0F', '#70F', '#00F'];
+    var button_colors = ['#00F', '#F00', '#F07', '#B0F', '#70F', '#40F'];
 
     var url = window.location.search; 
     url = url.substr(1, url.length);
@@ -189,6 +190,7 @@
     var waiting_to_being = false; // Whether we're waiting for a tap to begin.
     var langs = [];
     var langs_loaded = false;
+    var waiting_to_send = false; // Whether we're waiting for the next question in automatic mode.
 
     var sound_maintain = new Audio('maintain.ogg');
     var sound_correct = new Audio('correct.ogg');
@@ -532,11 +534,13 @@
       c.level = n;
 
       // Button levels
-      if     (n <= 1) { set_score(score+1);  cards.splice(1, 0, c); }
-      else if(n == 2) { set_score(score+2);  cards.splice(random_integer(2,Math.min(3,cards_remaining-1)), 0, c);}
-      else if(n == 3) { set_score(score+5);  cards.splice(random_integer(4,Math.min(7,cards_remaining-1)), 0, c);}
-      else if(n == 4) { set_score(score+10); cards.splice(random_integer(8,           cards_remaining-1 ), 0, c);}
-      else            { set_score(score+20); cards.push(c); set_remaining(cards_remaining-1);}
+      var N = cards_remaining-1; // max "live" index
+      if     (n <= 0) { set_score(score+10); cards.push(c); set_remaining(N);}
+      else if(n <= 1) { set_score(score+1);  cards.splice(1, 0, c); }
+      else if(n == 2) { set_score(score+2);  cards.splice(random_integer(2,Math.min(3,N)), 0, c);}
+      else if(n == 3) { set_score(score+3);  cards.splice(random_integer(4,Math.min(7,N)), 0, c);}
+      else if(n == 4) { set_score(score+4);  cards.splice(random_integer(8,           N ), 0, c);}
+      else if(n == 5) { set_score(score+5);  cards.splice(random_integer(Math.ceil(N*0.5), N), 0, c);}
 
       // Get and save the levels
       save_levels();
@@ -578,7 +582,9 @@
       waiting_to_begin = true;
     }
 
-    // Any tap on the window loads languages
+    // Any tap on the window loads languages; 
+    // This function stays bound to the touch events until more than one language loads.
+    // Annoying, true, but the voiceschanged event doesn't work on android for some reason. :\
     function first_touch() { console.log('first_touch()');
 
       // Check for language support
@@ -628,6 +634,20 @@
     // Displays the top card qestion & answer
     function show_question() { console.log('show_question()');
       waiting_to_begin = false;
+
+      // If we're waiting for the automatic next card timeout
+      if(waiting_to_send) {
+        // Stop the timer
+        clearTimeout(timer_send_card);
+        waiting_to_send = false;
+        
+        // Remove button colors
+        clear_buttons();
+
+        // Send it.
+        send_card_to_level(cards[0].level);
+        return;
+      }
 
       var q = document.getElementById('div-question');
       var a = document.getElementById('div-answer')  
@@ -685,8 +705,8 @@
       // And say it
       speak(a, select_avoice.value);
 
-      // In auto mode, decide where to put the card based on the time of the answer
-      if(document.getElementById('select-mode').value == 'auto' && t_delay_ms) {
+      // In auto mode (if we're not already waiting to send it), decide where to put the card based on the time of the answer
+      if(!waiting_to_send && document.getElementById('select-mode').value == 'auto' && t_delay_ms) {
         
         // Get the card
         var c = cards[0];
@@ -697,11 +717,11 @@
         // If we time out, downgrade
         if(r > 0.999) { c.level = Math.max(1, c.level-1); }
 
-        // If we're fast, upgrade and make a happy noise
+        // If we're sufficiently fast, upgrade and make a happy noise
         else if (r < 0.34) { 
-          c.level = Math.min(c.level+1, 5); 
-          if(c.level >= 5) sound_done   .play();
-          else             sound_correct.play();
+          c.level = c.level+1; 
+          if(c.level > 5) { c.level=0; sound_done   .play(); }
+          else                         sound_correct.play();
         }
 
         // Maintain
@@ -711,23 +731,31 @@
         light_button(c.level);
 
         // Send it
-        timer_send_card = setTimeout(send_card_to_level, Math.min(3000, t_question_ms), c.level);
+        waiting_to_send = true;
+        timer_send_card = setTimeout(send_card_to_level, 4000, c.level);
       }
+
+      // If we're waiting to send, reset that clock
+      if(waiting_to_send) {
+        clearTimeout(timer_send_card);
+        timer_send_card = setTimeout(send_card_to_level, 4000, cards[0].level);
+      }
+
     }
 
     // Lights up the button of the appropriate level.
     function light_button(level) {
       var b = document.getElementById('send'+String(level));
       b.style.transition = 'background-color 0.1s';
-      b.style.setProperty('background-color', button_colors[level-1]+'3');        
+      b.style.setProperty('background-color', button_colors[level]+'3');        
     }
 
     // Clears any button lights.
     function clear_buttons() {
-      for(var i=1; i<=5; i++) {
+      for(var i=0; i<=5; i++) {
         var b = document.getElementById('send'+String(i));
         b.style.transition = 'background-color 0.5s';
-        b.style.setProperty('background-color', button_colors[i-1]+'0');
+        b.style.setProperty('background-color', button_colors[i]+'0');
       }
     }
 
