@@ -217,6 +217,10 @@
     function save_cookie(key, value, expire_days) { console.log('save_cookie()', key, value);
         if(expire_days==undefined) expire_days=28;
 
+        // Get rid of weird key characters
+        key   = encodeURIComponent(key);
+        value = encodeURIComponent(value);
+
         // get the expiration date
         var d = new Date();
         d.setTime(d.getTime() + (expire_days*24*60*60*1000));
@@ -226,7 +230,8 @@
     }
 
     // Returns the cookie value or undefined
-    function load_cookie(key) {
+    function load_cookie(key) { 
+        key = encodeURIComponent(key);
         
         // get a list of the cookie elements
         var cs = document.cookie.split(';');
@@ -245,7 +250,7 @@
 
             // If it's our key
             if(s[0] == 'Sankey_Flashcards_'+key) {
-                value = s[1];
+                value = decodeURIComponent(s[1]);
                 break;
             };
         }
@@ -300,11 +305,11 @@
     function load_cards() {
 
       // Get the sheet key
-      var s = document.getElementById('select-sheet'); 
-      save_cookie('select_sheet', s.value);
+      var sheet = document.getElementById('select-sheet'); 
+      save_cookie('select_sheet', sheet.value);
       
       // Get the data for this sheet
-      var d = sheets[s.value].elements;
+      var d = sheets[sheet.value].elements;
       console.log('load_cards()', s.value, d.length);
 
       // If there is no deck
@@ -318,18 +323,40 @@
       var akey = Object.keys(d[0])[1];
 
       // Clear the existing deck and refill it.
-      cards = [];
-      var q, a;
-      for(var n in d) {
+      cards  = []; // Real, shuffled deck
+      cards0 = []; // Deck as loaded
+      var q, a, n;
+      for(n in d) {
         q = d[n][qkey];
         a = d[n][akey];
 
         // Ignore empty rows
-        if(q != '' || a != '') cards.push({q:q,a:a,level:1});
+        if(q != '' || a != '') 
+          // Question, answer, last send_to button pressed, unique id (row number in sheet)
+          cards0.push({q:q,a:a,level:1,id:cards0.length});
       }
 
+      // If we have a cookie, e.g., '4,2,3,1,5', load the previous order
+      var x = load_cookie('order_'+sheet.value);
+      if(x != null) {
+
+        // The cookie should be a list with index being id and value being position in deck
+        x = eval('['+x+']');
+
+        // Loop over cards, reordering. cards0 is ordered by id; 
+        for(var id=0; id<x.length; id++) 
+          // If we have this card loaded, put it into the "real" deck
+          if(id < cards0.length) cards[x[id]] = cards0[id]
+
+        // Clean out any empty slots
+        for(n=0; n<cards.length; n++) if(cards[n]==undefined) {cards.splice(n,1); n--;}
+      }
+    
+      // Otherwise, just use the given order
+      else cards = cards0;
+
       // Reset the number of cards remaining to practice
-      set_remaining(cards.length);
+      set_remaining(load_cookie('remaining_'+document.getElementById('select-sheet').value));
 
       // Show the top card
       show_question();
@@ -354,9 +381,12 @@
 
     // Update the cards remaining
     function set_remaining(n) { console.log('set_remaining()', n);
-      if(n == undefined) n = cards.length;
+      if(n == undefined || n == null) n = cards.length;
       cards_remaining = n;
-      document.getElementById('remaining').innerHTML = 'Remaining: '+String(n);
+
+      // Save the cookie & update the user
+      save_cookie('remaining_'+document.getElementById('select-sheet').value, n);
+      document.getElementById('remaining').innerHTML = 'Remaining: '+String(n)+'/'+String(cards.length);
     }
 
     // Returns a random integer from m to n
@@ -420,6 +450,11 @@
       else if(n == 3) { set_score(score+5);  cards.splice(random_integer(4,Math.min(7,cards_remaining-1)), 0, c);}
       else if(n == 4) { set_score(score+10); cards.splice(random_integer(8,           cards_remaining-1 ), 0, c);}
       else            { set_score(score+20); cards.push(c); set_remaining(cards_remaining-1);}
+
+      // Get and save the order
+      var order = [];
+      for(var i=0; i<cards.length; i++) order[cards[i].id] = i;
+      save_cookie('order_'+document.getElementById('select-sheet').value, order);
 
       // Clear any button highlights
       for(var i=1; i<=5; i++) {
