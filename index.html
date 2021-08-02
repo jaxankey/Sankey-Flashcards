@@ -126,7 +126,7 @@
     
     <div>
       <select id='select-avoice' onchange='change_avoice();' class='answer voice'></select>
-      <select id='select-delay'  class='answer voice' onchange="save_cookie('select_delay', this.value); show_question();">
+      <select id='select-delay'  class='answer voice' onchange="save_cookie('select_delay', this.value); show_start();">
         <option value='0'>&#8734;</option>
         <option value='250'>1/4 sec</option>
         <option value='500'>1/2 sec</option>
@@ -139,7 +139,7 @@
         <option value='10000'>10 sec</option>
         <option value='15000'>15 sec</option>
       </select>
-      <select id='select-mode' class='answer voice' onchange="save_cookie('select_mode', this.value); show_question();">
+      <select id='select-mode' class='answer voice' onchange="save_cookie('select_mode', this.value); show_start();">
         <option value='normal'>Normal</option>
         <option value='auto'>Auto</option>
       </select>
@@ -359,7 +359,7 @@
       set_remaining(load_cookie('remaining_'+document.getElementById('select-sheet').value));
 
       // Show the top card
-      show_question();
+      show_start();
     }
 
     function flip_cards() {
@@ -370,7 +370,7 @@
       select_qvoice.value = select_avoice.value;
       select_avoice.value = x;
       
-      show_question();
+      show_start();
     }
 
     // Update score
@@ -422,7 +422,7 @@
     function shuffle_cards() { console.log('shuffle_cards()');
       cards = shuffle_array(cards);
       set_remaining(cards.length);
-      show_question();
+      show_start();
     }
 
     function change_qvoice() {
@@ -478,6 +478,12 @@
       }
     }
 
+    // Shows the start message
+    function show_start() {
+      document.getElementById('div-question').innerHTML = '(tap to begin)';
+      document.getElementById('div-answer'  ).innerHTML = '';
+    }
+
     // Displays the top card qestion & answer
     function show_question() { console.log('show_question()');
       var q = document.getElementById('div-question');
@@ -520,7 +526,7 @@
       // Special case, we're done!
       if(cards_remaining<=0) {
         set_remaining(cards.length);
-        show_question();
+        show_start();
       }
 
       // Otherwise proceed
