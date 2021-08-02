@@ -196,8 +196,8 @@
     x     = load_cookie('select_mode');  if(x) document.getElementById('select-mode' ).value = x;
 
     // Add the "No voice" entry
-    o = document.createElement('option'); o.text = '-Silent-'; select_qvoice.add(o);
-    o = document.createElement('option'); o.text = '-Silent-'; select_avoice.add(o);
+    o = document.createElement('option'); o.text = 'Silent'; select_qvoice.add(o);
+    o = document.createElement('option'); o.text = 'Silent'; select_avoice.add(o);
     
     // Load the speech cookie
     if(speechSynthesis) {
