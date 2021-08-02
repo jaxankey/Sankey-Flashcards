@@ -217,7 +217,7 @@
     if(x) {
       console.log('loaded', x);
       // Get it into array form
-      langs = eval('['+x+']');
+      langs = x.split(',');
       rebuild_lang_lists();
     }
 
