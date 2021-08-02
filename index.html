@@ -551,24 +551,23 @@
       // Check for language support
       if(!langs_loaded && window.speechSynthesis) {
         
-        // Only do this once; remove event handler
-        document.body.ontouchstart = undefined;
-        document.body.onpointerdown = undefined;
-      
         // Get the available voice languages
         langs  = [];
         var o;
         var select_qvoice = document.getElementById('select-qvoice');
         var select_avoice = document.getElementById('select-avoice');
         
+        // Get voices (and quit if none come back)
         voices = window.speechSynthesis.getVoices();
-        console.log(voices);
+        if(!voices.length) return;
+
+        // Only do this once; remove event handler
+        document.body.ontouchstart = undefined;
+        document.body.onpointerdown = undefined;
 
         // If we don't already have the language of each voice, add it to Q and A
         for(var n in voices) if(!langs.includes(voices[n].lang)) langs.push(voices[n].lang);
       
-        console.log(langs);
-
         // Alphabetize the languages
         langs.sort();
         langs.splice(0,0,'Silent');
