@@ -88,7 +88,7 @@
       margin: 7px 3.5px;
       cursor: pointer;
       font-family: 'Times New Roman', Times, serif;
-      font-weight: bold;
+      font-weight: normal;
     }
     .voice {
       margin-left: 7px;
@@ -108,9 +108,11 @@
 
   <div class='bottom_controls'>
     <select onchange='load_cards();' id='select-sheet' style='margin-bottom:0; flex-grow: 1;'></select>
-    <button onclick='shuffle_cards();' style='margin-bottom:0'>Shuffle</button>
-    <button onclick='flip_cards();' style='margin-bottom:0'>Flip</button>
-    <button onclick='edit();' style='margin-bottom:0'>Edit</button>
+  
+    <button onclick ='shuffle_cards(true);' style='margin-bottom:0'>Reset</button>
+    <button onclick ='shuffle_cards();' style='margin-bottom:0'>Shuffle</button>
+    <button onclick ='flip_cards();' style='margin-bottom:0'>Flip</button>
+    <button onclick ='edit();' style='margin-bottom:0'>Edit</button>
   </div>
   <div class='top_controls'>
     <button id='score'     class='score' onclick='set_score(0);'    >Score: 0</button>
@@ -181,6 +183,7 @@
     var timer_send_card = false; // timeout object while we show the answer before sending it.
     var t_delay_ms = 0;       // Delay setting
     var t_question_ms = 0;    // Time the question was asked
+    var waiting_to_being = false; // Whether we're waiting for a tap to begin.
 
     var sound_maintain = new Audio('maintain.ogg');
     var sound_correct = new Audio('correct.ogg');
@@ -189,10 +192,6 @@
     // Add the "No voice" entry
     o = document.createElement('option'); o.text = 'Silent'; select_qvoice.add(o);
     o = document.createElement('option'); o.text = 'Silent'; select_avoice.add(o);
-    var langs = ["de-DE", "en-US", "en-GB", "es-ES", "es-US", 
-                 "fr-FR", "hi-IN", "id-ID", "it-IT", "ja-JP", 
-                 "ko-KR", "nl-NL", "pl-PL", "pt-BR", "ru-RU", 
-                 "zh-CN", "zh-HK", "zh-TW"];
     
     // Load the timeout value and mode
     var x = load_cookie('select_delay'); if(x) document.getElementById('select-delay').value = x;
@@ -200,6 +199,12 @@
 
     // Check for language support
     if(speechSynthesis) {
+      // Get the available voice languages
+      langs  = [];
+      voices = speechSynthesis.getVoices();
+      for(var n in voices) if(!langs.includes(voices[n].lang)) langs.push(voices[n].lang); 
+    
+      // Add the existing languages to the list.
       for(var k in langs) {
         o = document.createElement('option'); o.text = langs[k]; select_qvoice.add(o);
         o = document.createElement('option'); o.text = langs[k]; select_avoice.add(o);
@@ -336,6 +341,20 @@
           cards0.push({q:q,a:a,level:1,id:cards0.length});
       }
 
+      // If we have a cookie for each card's level, load this
+      var x = load_cookie('levels_'+sheet.value);
+      if(x != null) {
+
+        // The cookie should be a list with index being id and value being card level
+        x = eval('['+x+']');
+
+        for(var id=0; id<x.length; id++) 
+          // If we have this card loaded, update the level
+          if(id < cards0.length) cards0[id].level = x[id];
+
+        console.log(cards0);
+      }
+
       // If we have a cookie, e.g., '4,2,3,1,5', load the previous order
       var x = load_cookie('order_'+sheet.value);
       if(x != null) {
@@ -382,6 +401,9 @@
     // Update the cards remaining
     function set_remaining(n) { console.log('set_remaining()', n);
       if(n == undefined || n == null) n = cards.length;
+      n = Math.max(n,0);
+
+      // Remember this
       cards_remaining = n;
 
       // Save the cookie & update the user
@@ -419,9 +441,23 @@
     }
 
     // Shuffles the deck
-    function shuffle_cards() { console.log('shuffle_cards()');
-      cards = shuffle_array(cards);
+    function shuffle_cards(original_order) { console.log('shuffle_cards()');
+    
+      // Do the actual shuffling
+      if(original_order) cards = cards0;
+      else               cards = shuffle_array(cards);
+      
+      // Reset the deck
       set_remaining(cards.length);
+      
+      // Reset the levels
+      for(var i in cards) cards[i].level=1;
+
+      // Save the levels and order
+      save_levels();
+      save_order();
+
+      // Show the starting card
       show_start();
     }
 
@@ -434,6 +470,18 @@
       show_answer();
     }
 
+    function save_levels() {
+      var levels = [];
+      for(var i=0; i<cards0.length; i++) levels[i] = cards0[i].level;
+      save_cookie('levels_'+document.getElementById('select-sheet').value, levels);
+    }
+
+    function save_order() {
+      var order = [];
+      for(var i=0; i<cards.length; i++) order[cards[i].id] = i;
+      save_cookie('order_'+document.getElementById('select-sheet').value, order);
+    }
+
     // Sends the top card to index n. 0 means "bottom", undefined means "random > 2"
     function send_card_to_level(n) { 
       console.log('send_card_to_level()', n);
@@ -444,6 +492,9 @@
       // Get the top card
       var c = cards.splice(0,1)[0];
 
+      // Remember the level
+      c.level = n;
+
       // Button levels
       if     (n <= 1) { set_score(score+1);  cards.splice(1, 0, c); }
       else if(n == 2) { set_score(score+2);  cards.splice(random_integer(2,Math.min(3,cards_remaining-1)), 0, c);}
@@ -451,17 +502,14 @@
       else if(n == 4) { set_score(score+10); cards.splice(random_integer(8,           cards_remaining-1 ), 0, c);}
       else            { set_score(score+20); cards.push(c); set_remaining(cards_remaining-1);}
 
-      // Get and save the order
-      var order = [];
-      for(var i=0; i<cards.length; i++) order[cards[i].id] = i;
-      save_cookie('order_'+document.getElementById('select-sheet').value, order);
+      // Get and save the levels
+      save_levels();
+
+      // Get and save order
+      save_order();
 
       // Clear any button highlights
-      for(var i=1; i<=5; i++) {
-        var b = document.getElementById('send'+String(i));
-        b.style.transition = 'background-color 0.5s';
-        b.style.setProperty('background-color', button_colors[i-1]+'0');
-      }
+      clear_buttons();
 
       // Show the top card
       show_question();
@@ -480,19 +528,31 @@
 
     // Shows the start message
     function show_start() {
+
+      // Clear the timers
+      if(timer_answer) clearTimeout(timer_answer);
+      if(timer_send_card) clearTimeout(timer_send_card)
+
+      // Clear any buttons that are lit
+      clear_buttons();
+
       document.getElementById('div-question').innerHTML = '(tap to begin)';
-      document.getElementById('div-answer'  ).innerHTML = '';
+      document.getElementById('div-answer'  ).innerHTML = '&nbsp';
+
+      waiting_to_begin = true;
     }
 
     // Displays the top card qestion & answer
     function show_question() { console.log('show_question()');
+      waiting_to_begin = false;
+
       var q = document.getElementById('div-question');
       var a = document.getElementById('div-answer')  
       
       // If it's zero, we show a special card
       if(cards_remaining<=0) {
-        q.innerHTML = 'All done!'
-        a.innerHTML = '(tap to begin)'
+        q.innerHTML = 'All done!';
+        a.innerHTML = '&nbsp';
       }
       
       // Otherwise show the top card
@@ -514,6 +574,9 @@
 
     // Show the answer and say it.
     function show_answer() { console.log('show_answer()');
+      
+      // If we're waiting to begin, show question and poop out
+      if(waiting_to_begin) { show_question(); return; }
 
       // If we're waiting to show, cancel the timer.
       if(timer_answer) clearTimeout(timer_answer);
@@ -554,7 +617,7 @@
         // If we're fast, upgrade and make a happy noise
         else if (r < 0.34) { 
           c.level = Math.min(c.level+1, 5); 
-          if(c.level >= 5) sound_done.play();
+          if(c.level >= 5) sound_done   .play();
           else             sound_correct.play();
         }
 
@@ -562,12 +625,26 @@
         else sound_maintain.play();
         
         // Light the button for a moment
-        var b = document.getElementById('send'+String(c.level));
-        b.style.transition = 'background-color 0.1s';
-        b.style.setProperty('background-color', button_colors[c.level-1]+'3');        
+        light_button(c.level);
 
         // Send it
         timer_send_card = setTimeout(send_card_to_level, Math.min(3000, t_question_ms), c.level);
+      }
+    }
+
+    // Lights up the button of the appropriate level.
+    function light_button(level) {
+      var b = document.getElementById('send'+String(level));
+      b.style.transition = 'background-color 0.1s';
+      b.style.setProperty('background-color', button_colors[level-1]+'3');        
+    }
+
+    // Clears any button lights.
+    function clear_buttons() {
+      for(var i=1; i<=5; i++) {
+        var b = document.getElementById('send'+String(i));
+        b.style.transition = 'background-color 0.5s';
+        b.style.setProperty('background-color', button_colors[i-1]+'0');
       }
     }
 
