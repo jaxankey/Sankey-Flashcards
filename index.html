@@ -103,7 +103,7 @@
 
 </head>
 
-<body ontouchstart="first_touch();">
+<body onpointerdown="first_touch();" ontouchstart="first_touch();">
 
 
   <div class='bottom_controls'>
@@ -196,8 +196,8 @@
     x     = load_cookie('select_mode');  if(x) document.getElementById('select-mode' ).value = x;
 
     // Add the "No voice" entry
-    o = document.createElement('option'); o.text = 'Silent'; select_qvoice.add(o);
-    o = document.createElement('option'); o.text = 'Silent'; select_avoice.add(o);
+    o = document.createElement('option'); o.text = '-Silent-'; select_qvoice.add(o);
+    o = document.createElement('option'); o.text = '-Silent-'; select_avoice.add(o);
     
     // Load the speech cookie
     if(speechSynthesis) {
@@ -550,6 +550,7 @@
 
       // Only do this once; remove event handler
       document.body.ontouchstart = undefined;
+      document.body.onpointerdown = undefined;
 
       // Check for language support
       if(!langs_loaded && speechSynthesis) {
