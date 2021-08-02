@@ -198,6 +198,9 @@
     var x = load_cookie('select_delay'); if(x) document.getElementById('select-delay').value = x;
     x     = load_cookie('select_mode');  if(x) document.getElementById('select-mode' ).value = x;
 
+    // Janky sleep function
+    function sleep(ms) {return new Promise(resolve => setTimeout(resolve, ms));}
+
     // Clears the existing language options and repopulates using langs.
     function rebuild_lang_lists() {
 
@@ -216,6 +219,7 @@
     x = load_cookie('langs');
     if(x) {
       console.log('loaded', x);
+
       // Get it into array form
       langs = x.split(',');
       rebuild_lang_lists();
@@ -585,9 +589,12 @@
         var select_qvoice = document.getElementById('select-qvoice');
         var select_avoice = document.getElementById('select-avoice');
         
-        // Get voices (and quit if none come back)
-        voices = window.speechSynthesis.getVoices();
-        if(!voices.length) return;
+        // Wait for the voices (and quit if none come back)
+        voices = [];
+        while(!voices.length) {
+          voices = window.speechSynthesis.getVoices();
+          sleep(20);
+        }
 
         // Only do this once; remove event handler
         document.body.ontouchstart = undefined;
