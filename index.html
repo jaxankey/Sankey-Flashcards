@@ -103,7 +103,7 @@
 
 </head>
 
-<body>
+<body onpointerdown="first_touch();" ontouchstart="first_touch();">
 
 
   <div class='bottom_controls'>
@@ -198,8 +198,11 @@
     var x = load_cookie('select_delay'); if(x) document.getElementById('select-delay').value = x;
     x     = load_cookie('select_mode');  if(x) document.getElementById('select-mode' ).value = x;
 
+    // Janky sleep
+    function sleep(ms) {return new Promise(resolve => setTimeout(resolve, ms));}
+
     // Clears the existing language options and repopulates using langs.
-    function rebuild_lang_lists() { console.log('rebuild_lang_lists()', langs);
+    function rebuild_lang_lists() {
 
       // Clear the selector options
       while(select_qvoice.length) select_qvoice.remove(0);
@@ -215,7 +218,7 @@
     // Load any remembered languages
     x = load_cookie('langs');
     if(x) {
-      console.log('loaded langs', x);
+      console.log('loaded', x);
 
       // Get it into array form
       langs = x.split(',');
@@ -553,6 +556,7 @@
       if(lang != 'Silent') {
         var utterance = new SpeechSynthesisUtterance();
         utterance.lang = lang;
+        //utterance.voice = speechSynthesis.getVoices()[3];
         utterance.text = qa.innerText;
         window.speechSynthesis.speak(utterance);
       }
@@ -575,42 +579,51 @@
     }
 
     // Any tap on the window loads languages
-    function voices_changed() { console.log('voices_changed()');
+    function first_touch() { console.log('first_touch()');
 
-      // Get the available voice languages
-      langs  = [];
-      var select_qvoice = document.getElementById('select-qvoice');
-      var select_avoice = document.getElementById('select-avoice');
+      // Check for language support
+      if(!langs_loaded && window.speechSynthesis) {
+        
+        // Get the available voice languages
+        langs  = [];
+        var select_qvoice = document.getElementById('select-qvoice');
+        var select_avoice = document.getElementById('select-avoice');
+        
+        // Get voices (and quit if none come back)
+        voices = window.speechSynthesis.getVoices();
+        if(!voices.length) return;
+
+        // Only do this once; remove event handler
+        document.body.ontouchstart = undefined;
+        document.body.onpointerdown = undefined;
+
+        // If we don't already have the language of each voice, add it to Q and A
+        for(var n in voices) if(!langs.includes(voices[n].lang)) langs.push(voices[n].lang);
       
-      // Get voices (and quit if none come back)
-      voices = window.speechSynthesis.getVoices(); console.log('  ', voices.length, 'voices found.');
-      if(!voices.length) return;
+        // Alphabetize the languages
+        langs.sort();
+        langs.splice(0,0,'Silent');
 
-      // If we don't already have the language of each voice, add it to Q and A
-      for(var n in voices) if(!langs.includes(voices[n].lang)) langs.push(voices[n].lang);
-    
-      // Alphabetize the languages
-      langs.sort();
-      langs.splice(0,0,'Silent');
+        // Remember the languages
+        save_cookie('langs', langs);
 
-      // Remember the languages
-      save_cookie('langs', langs);
+        // Remember the current selection
+        var qvoice = select_qvoice.value;
+        var avoice = select_avoice.value;
 
-      // Remember the current selection
-      var qvoice = select_qvoice.value;
-      var avoice = select_avoice.value;
+        // Rebuild the lists
+        rebuild_lang_lists();
 
-      // Rebuild the lists
-      rebuild_lang_lists();
+        // Put in the previous values
+        select_qvoice.value = qvoice;
+        select_avoice.value = avoice;
 
-      // Put in the previous values
-      select_qvoice.value = qvoice;
-      select_avoice.value = avoice;
+        // No need to repeat this
+        langs_loaded = false;
+      } 
 
       // Remove this event listener
     }
-    // Also make sure the lang list updates whenever something changes / loads
-    window.speechSynthesis.addEventListener('voiceschanged', voices_changed);
 
     // Displays the top card qestion & answer
     function show_question() { console.log('show_question()');
