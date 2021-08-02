@@ -184,36 +184,38 @@
     var t_delay_ms = 0;       // Delay setting
     var t_question_ms = 0;    // Time the question was asked
     var waiting_to_being = false; // Whether we're waiting for a tap to begin.
+    var langs = [];
+    var langs_loaded = false;
 
     var sound_maintain = new Audio('maintain.ogg');
     var sound_correct = new Audio('correct.ogg');
     var sound_done    = new Audio('done.ogg');
     
-    // Add the "No voice" entry
-    o = document.createElement('option'); o.text = 'Silent'; select_qvoice.add(o);
-    o = document.createElement('option'); o.text = 'Silent'; select_avoice.add(o);
-    
     // Load the timeout value and mode
     var x = load_cookie('select_delay'); if(x) document.getElementById('select-delay').value = x;
     x     = load_cookie('select_mode');  if(x) document.getElementById('select-mode' ).value = x;
 
-    // Check for language support
-    if(speechSynthesis) {
-      // Get the available voice languages
-      langs  = [];
-      voices = speechSynthesis.getVoices();
-      for(var n in voices) if(!langs.includes(voices[n].lang)) langs.push(voices[n].lang); 
+    // Add the "No voice" entry
+    o = document.createElement('option'); o.text = 'Silent'; select_qvoice.add(o);
+    o = document.createElement('option'); o.text = 'Silent'; select_avoice.add(o);
     
-      // Add the existing languages to the list.
-      for(var k in langs) {
-        o = document.createElement('option'); o.text = langs[k]; select_qvoice.add(o);
-        o = document.createElement('option'); o.text = langs[k]; select_avoice.add(o);
+    // Load the speech cookie
+    if(speechSynthesis) {
+
+      // Load the cookies
+      var x = load_cookie('select_qvoice'); 
+      if(x) {
+        if(!langs.includes(x)) langs.push(x);
+        o = document.createElement('option'); o.text = x; select_qvoice.add(o); select_qvoice.value = x;
       }
       
-      // Load the cookie
-      var x = load_cookie('select_qvoice'); if(x) select_qvoice.value = x;
-      x     = load_cookie('select_avoice'); if(x) select_avoice.value = x;
+      x = load_cookie('select_avoice');
+      if(x) {
+        if(!langs.includes(x)) langs.push(x);
+        o = document.createElement('option'); o.text = x; select_avoice.add(o); select_avoice.value = x;
+      }
     }
+
 
     // Goes to the sheet to edit
     function edit() {location.href=url;}
@@ -545,6 +547,22 @@
     // Displays the top card qestion & answer
     function show_question() { console.log('show_question()');
       waiting_to_begin = false;
+
+      // Check for language support
+      if(!langs_loaded && speechSynthesis) {
+        
+        // Get the available voice languages
+        langs  = [];
+        var o;
+        voices = speechSynthesis.getVoices();
+
+        // If we don't already have the language of each voice, add it to Q and A
+        for(var n in voices) if(!langs.includes(voices[n].lang)) {
+          langs.push(voices[n].lang);
+          o = document.createElement('option'); o.text = voices[n].lang; select_qvoice.add(o);
+          o = document.createElement('option'); o.text = voices[n].lang; select_avoice.add(o);
+        }
+      }
 
       var q = document.getElementById('div-question');
       var a = document.getElementById('div-answer')  
