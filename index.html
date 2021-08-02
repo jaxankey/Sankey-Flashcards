@@ -103,7 +103,7 @@
 
 </head>
 
-<body onpointerdown="first_tap();">
+<body ontouchstart="first_touch();">
 
 
   <div class='bottom_controls'>
@@ -546,10 +546,10 @@
     }
 
     // Any tap on the window loads languages
-    function first_tap() { console.log('first_tap()');
+    function first_touch() { console.log('first_touch()');
 
       // Only do this once; remove event handler
-      document.body.onpointerdown = undefined;
+      document.body.ontouchstart = undefined;
 
       // Check for language support
       if(!langs_loaded && speechSynthesis) {
