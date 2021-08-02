@@ -562,10 +562,13 @@
         var select_avoice = document.getElementById('select-avoice');
         
         voices = speechSynthesis.getVoices();
+        console.log(voices);
 
         // If we don't already have the language of each voice, add it to Q and A
         for(var n in voices) if(!langs.includes(voices[n].lang)) langs.push(voices[n].lang);
       
+        console.log(langs);
+
         // Alphabetize the languages
         langs.sort();
         langs.splice(0,0,'Silent');
@@ -593,7 +596,6 @@
       } 
 
       // Remove this event listener
-
     }
 
     // Displays the top card qestion & answer
