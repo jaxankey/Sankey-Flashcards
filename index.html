@@ -145,7 +145,7 @@
       </select>
       <select id='select-mode' class='answer voice' onchange="save_cookie('select_mode', this.value); show_start();"
               style='margin-left:0; margin-right:0;'>>
-        <option value='normal'>Normal</option>
+        <option value='normal'>Tap</option>
         <option value='auto'>Auto</option>
       </select>
     </div>
@@ -198,9 +198,35 @@
     var x = load_cookie('select_delay'); if(x) document.getElementById('select-delay').value = x;
     x     = load_cookie('select_mode');  if(x) document.getElementById('select-mode' ).value = x;
 
-    // Add the "No voice" entry
-    o = document.createElement('option'); o.text = 'Silent'; select_qvoice.add(o);
-    o = document.createElement('option'); o.text = 'Silent'; select_avoice.add(o);
+    // Clears the existing language options and repopulates using langs.
+    function rebuild_lang_lists() {
+
+      // Clear the selector options
+      while(select_qvoice.length) select_qvoice.remove(0);
+      while(select_avoice.length) select_avoice.remove(0);
+
+      // Now add them all again
+      for(var i in langs) {
+        var o = document.createElement('option'); o.text = langs[i]; select_qvoice.add(o);
+            o = document.createElement('option'); o.text = langs[i]; select_avoice.add(o);
+      }
+    }
+
+    // Load any remembered languages
+    x = load_cookie('langs');
+    if(x) {
+      console.log('loaded', x);
+      // Get it into array form
+      langs = eval('['+x+']');
+      rebuild_lang_lists();
+    }
+
+    // Otherwise, do something simple
+    else {
+      langs = ['Silent'];
+      var o = document.createElement('option'); o.text = 'Silent'; select_qvoice.add(o);
+          o = document.createElement('option'); o.text = 'Silent'; select_avoice.add(o);
+    }  
     
     // Load the speech cookie
     if(window.speechSynthesis) {
@@ -556,7 +582,6 @@
         
         // Get the available voice languages
         langs  = [];
-        var o;
         var select_qvoice = document.getElementById('select-qvoice');
         var select_avoice = document.getElementById('select-avoice');
         
@@ -575,19 +600,15 @@
         langs.sort();
         langs.splice(0,0,'Silent');
 
+        // Remember the languages
+        save_cookie('langs', langs);
+
         // Remember the current selection
         var qvoice = select_qvoice.value;
         var avoice = select_avoice.value;
 
-        // Clear the selector options
-        while(select_qvoice.length) select_qvoice.remove(0);
-        while(select_avoice.length) select_avoice.remove(0);
-
-        // Now add them all again
-        for(var i in langs) {
-          o = document.createElement('option'); o.text = langs[i]; select_qvoice.add(o);
-          o = document.createElement('option'); o.text = langs[i]; select_avoice.add(o);
-        }
+        // Rebuild the lists
+        rebuild_lang_lists();
 
         // Put in the previous values
         select_qvoice.value = qvoice;
