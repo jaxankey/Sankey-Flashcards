@@ -406,6 +406,9 @@
           // If we have this card loaded, put it into the "real" deck
           if(id < cards0.length) cards[x[id]] = cards0[id]
 
+        // Now include the remainder, in case cards have since been added.
+        cards = cards.concat(cards0.slice(cards.length))
+
         // Clean out any empty slots
         for(n=0; n<cards.length; n++) if(cards[n]==undefined) {cards.splice(n,1); n--;}
       }
