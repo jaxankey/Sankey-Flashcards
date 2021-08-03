@@ -45,7 +45,7 @@
     .question, .answer {
       flex-grow: 1;
       text-align: center;
-      font-size: 1.7em;
+      font-size: 1.5em;
       margin-left: 7px;
       margin-right: 7px;
       background-color: white;
@@ -353,7 +353,7 @@
       
       // Get the data for this sheet
       var d = sheets[sheet.value].elements;
-      console.log('load_cards()', s.value, d.length);
+      console.log('load_cards()', sheet.value, d.length);
 
       // If there is no deck
       if(!d.length) {
@@ -370,6 +370,7 @@
       cards0 = []; // Deck as loaded
       var q, a, n;
       for(n in d) {
+        console.log(n, d[n]);
         q = d[n][qkey];
         a = d[n][akey];
 
