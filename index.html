@@ -45,7 +45,7 @@
     .question, .answer {
       flex-grow: 1;
       text-align: center;
-      font-size: 2.0em;
+      font-size: 1.7em;
       margin-left: 7px;
       margin-right: 7px;
       background-color: white;
@@ -108,11 +108,11 @@
 
   <div class='bottom_controls'>
     <select onchange='load_cards();' id='select-sheet' style='margin-bottom:0; flex-grow: 1;'></select>
-  
-    <button onclick ='shuffle_cards(true);' style='margin-bottom:0'>Reset</button>
-    <button onclick ='shuffle_cards();' style='margin-bottom:0'>Shuffle</button>
-    <button onclick ='flip_cards();' style='margin-bottom:0'>Flip</button>
-    <button onclick ='edit();' style='margin-bottom:0'>Edit</button>
+  </div><div class='bottom_controls'>
+    <button onclick ='shuffle_cards(true);' style='margin-bottom:0; flex-grow: 1;'>Reset</button>
+    <button onclick ='shuffle_cards();' style='margin-bottom:0; flex-grow: 1;'>Shuffle</button>
+    <button onclick ='flip_cards();' style='margin-bottom:0; flex-grow: 1;'>Flip</button>
+    <button onclick ='edit();' style='margin-bottom:0; flex-grow: 1;'>Edit</button>
   </div>
   <div class='top_controls'>
     <button id='score'     class='score' onclick='set_score(0);'    >Score: 0</button>
