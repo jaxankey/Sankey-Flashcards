@@ -370,7 +370,8 @@
       cards0 = []; // Deck as loaded
       var q, a, n;
       for(n in d) {
-        console.log(n, d[n]);
+        
+        // Get the question and answer
         q = d[n][qkey];
         a = d[n][akey];
 
@@ -527,6 +528,7 @@
     // Sends the top card to index n. 0 means "bottom", undefined means "random > 2"
     function send_card_to_level(n) { 
       console.log('send_card_to_level()', n);
+      waiting_to_send = false;
 
       // Clear the timer if it exists, to avoid double-calls
       if(timer_send_card) clearTimeout(timer_send_card);
