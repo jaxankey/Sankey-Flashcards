@@ -154,12 +154,12 @@
   </div>
 
   <div class='bottom_controls'>
-    <button id='send1' onclick='send_card_to_level(1);' class='control' style='border: solid #F004 1px; color:red'>Redo</button>
-    <button id='send2' onclick='send_card_to_level(2);' class='control' style='border: solid #F074 1px; color:#F07'>2-3</button>
-    <button id='send3' onclick='send_card_to_level(3);' class='control' style='border: solid #B0F4 1px; color:#B0F'>4-7</button>
-    <button id='send4' onclick='send_card_to_level(4);' class='control' style='border: solid #70F4 1px; color:#70F'>8-?</button>
+    <button id='send1' onclick='send_card_to_level(1);' class='control' style='border: solid #F004 1px; color:red'>1-2</button>
+    <button id='send2' onclick='send_card_to_level(2);' class='control' style='border: solid #F074 1px; color:#F07'>2-4</button>
+    <button id='send3' onclick='send_card_to_level(3);' class='control' style='border: solid #B0F4 1px; color:#B0F'>4-8</button>
+    <button id='send4' onclick='send_card_to_level(4);' class='control' style='border: solid #70F4 1px; color:#70F'>8-16</button>
     <button id='send5' onclick='send_card_to_level(5);' class='control' style='border: solid #40F4 1px; color:#40F'>?</button>
-    <button id='send0' onclick='send_card_to_level(0);' class='control' style='border: solid #00F4 1px; color:blue'>Done</button>
+    <button id='send0' onclick='send_card_to_level(0);' class='control' style='border: solid #00F4 1px; color:blue'>&#128513;</button>
   </div>
 
 
@@ -541,11 +541,11 @@
       // Button levels
       var N = cards_remaining-1; // max "live" index
       if     (n <= 0) { set_score(score+10); cards.push(c); set_remaining(N);}
-      else if(n <= 1) { set_score(score+1);  cards.splice(1, 0, c); }
-      else if(n == 2) { set_score(score+2);  cards.splice(random_integer(2,Math.min(3,N)), 0, c);}
-      else if(n == 3) { set_score(score+3);  cards.splice(random_integer(4,Math.min(7,N)), 0, c);}
-      else if(n == 4) { set_score(score+4);  cards.splice(random_integer(8,           N ), 0, c);}
-      else if(n == 5) { set_score(score+5);  cards.splice(random_integer(Math.ceil(N*0.5), N), 0, c);}
+      else if(n <= 1) { set_score(score+1);  cards.splice(random_integer(Math.min(1,N),Math.min(2,N)),  0, c); }
+      else if(n == 2) { set_score(score+2);  cards.splice(random_integer(Math.min(2,N),Math.min(4,N)),  0, c); }
+      else if(n == 3) { set_score(score+3);  cards.splice(random_integer(Math.min(4,N),Math.min(8,N)),  0, c); }
+      else if(n == 4) { set_score(score+4);  cards.splice(random_integer(Math.min(8,N),Math.min(16,N)), 0, c); }
+      else if(n == 5) { set_score(score+5);  cards.splice(random_integer(Math.ceil(N*0.5), N),          0, c); }
 
       // Get and save the levels
       save_levels();
