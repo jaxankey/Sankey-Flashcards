@@ -109,10 +109,9 @@
     <select onchange='load_cards();' id='select-sheet' style='margin-bottom:0; flex-grow: 1;'></select>
   </div -->
   <div class='bottom_controls'>
-    <button onclick ='shuffle_cards(true);' style='margin-bottom:0; flex-grow: 1;'>Reset</button>
+    <button onclick ='reset();' style='margin-bottom:0; flex-grow: 1;'>Reset</button>
     <button onclick ='shuffle_cards();' style='margin-bottom:0; flex-grow: 1;'>Shuffle</button>
     <button onclick ='flip_cards();' style='margin-bottom:0; flex-grow: 1;'>Flip</button>
-    <button onclick ='edit();' style='margin-bottom:0; flex-grow: 1;'>Edit</button>
   </div>
   <div class='top_controls'>
     <button id='score'     class='score' onclick='set_score(0);'    >Score: 0</button>
@@ -246,9 +245,6 @@
     }
 
 
-    // Goes to the sheet to edit
-    function edit() {location.href=url;}
-
     // Saves a cookie
     function save_cookie(key, value, expire_days) { console.log('save_cookie()', key, value);
         if(expire_days==undefined) expire_days=28;
@@ -358,10 +354,22 @@
       }
     
       // Otherwise, just use the given order
-      else cards = cards0;
+      else cards = [...cards0];
 
       // Reset the number of cards remaining to practice
       set_remaining(load_cookie('remaining'));
+
+      // Show the top card
+      show_start();
+    }
+
+    function reset() {
+
+      // Reset the cards
+      cards = [...cards0];
+
+      // Reset the score
+      set_score(0);
 
       // Show the top card
       show_start();
