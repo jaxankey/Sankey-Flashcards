@@ -399,6 +399,7 @@
     function set_remaining(n) { console.log('set_remaining()', n);
       if(n == undefined || n == null) n = cards.length;
       n = Math.max(n,0);
+      n = Math.min(cards.length,n);
 
       // Remember this
       cards_remaining = n;
