@@ -34,11 +34,15 @@ as in the examples below. Bookmark the resulting web address. :)
  * `Flip` will reverse questions and answers.
  * Tapping `Score` will reset it to zero.
  * Tapping `Remaining` will re-add all the cards previously marked `Done` to the end of the stack.
- * The pull-down menus above the question and answer areas (`Silent` by default) will select a spoken language (if speech synthesis is available on your browser).
+ * The first pull-down menu above the question and answer areas (`Silent` by default) will select a spoken language (if speech synthesis is available on your browser).
+ * The second pull-down above the answers sets the delay before automatically showing the card.
+ * The third pull-down above the answers sets whether you must manually tap the depth, or let it automatically choose the depth after you tap the answer area.
 
 ## The Method
 
-If you get a card wrong or have difficulty, tap `Redo` until it feels automatic, and then progressively upgrading the depth, waiting at each stage until it again becomes automatic. When it's automatic a few times at a high depth, you can use `Done` to remove it from the loop. Note cards *will* often regress back to "difficult", so expect to downgrade often throughout the process. 
+If you get a card wrong or have difficulty, tap `1-2` until it feels automatic, and then progressively upgrade the depth, waiting at each stage until it again becomes automatic. When it's automatic a few times at a high depth, tap the smiley face to remove it from the loop. 
+
+Note: Definitely expect your fluency to often regress and downgrade the depth when needed! Downgrading is not a bad thing.
 
 ## Examples
  * [Addition and German Google Sheet](https://docs.google.com/spreadsheets/d/1IfWy8aefe9aNUO3OJ2bKv2Vtb28eEx2XUfMyYPiZv8c/)
