@@ -250,7 +250,7 @@
         if(expire_days==undefined) expire_days=28;
 
         // Get rid of weird key characters
-        key   = encodeURIComponent(key);
+        key   = encodeURIComponent(key)+'_'+window.location.search;
         value = encodeURIComponent(value);
 
         // get the expiration date
@@ -263,7 +263,7 @@
 
     // Returns the cookie value or undefined
     function load_cookie(key) { 
-        key = encodeURIComponent(key);
+        key = encodeURIComponent(key)+'_'+window.location.search;
         
         // get a list of the cookie elements
         var cs = document.cookie.split(';');
