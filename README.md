@@ -8,7 +8,7 @@ Turn any web-published CSV or [Google Sheet](https://docs.google.com/spreadsheet
 
 Any URL pointing to a CSV file will work, provided the CSV file has two columns: the first column contains the "questions", and the second column contains "answers". The first row will be skipped (use this for column labels!), as will any rows with blank entries in the first or second column. Once you have this web address, paste it to the end of this: 
 
-`https://jaxankey.github.io/Sankey-Flashcards/?` 
+[https://jaxankey.github.io/Sankey-Flashcards/?](https://jaxankey.github.io/Sankey-Flashcards/?)
 
 as in the examples below. Bookmark the resulting web address. :)
 
