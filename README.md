@@ -1,4 +1,4 @@
-<p align="center"><img src="https://github.com/jaxankey/Sankey-Flashcards/raw/main/screenshot.png"></p>
+<p align="center"><img src="https://github.com/jaxankey/Sankey-Flashcards/raw/main/screenshots/screenshot.png"></p>
 
 # A Google Sheets Flashcard Web-App
 
@@ -8,8 +8,9 @@ Turn any published google sheet into Sankey-style flashcards on any device, and 
 
  1. Create a [Google Sheets](https://docs.google.com/spreadsheets/u/0/) document with a column for questions and a column for answers. The first row will be ignored, so you can use this as a column label. Add a few entries to play with.
  2. Select `File` -> `Publish to the web`, select the desired sheets and `Comma-separated values (.csv)'`, then push the green `Publish` button.
- 3. Finish the process and return to the sheet, then copy its URL (or just the sheet id) from the browser's address bar, and paste this onto the end of the following URL: `https://jaxankey.github.io/Sankey-Flashcards/?`. See examples below.
-
+ 3. Type `ctrl`+`c` to copy the gnasty URL from this and paste this onto the end of the following URL: `https://jaxankey.github.io/Sankey-Flashcards/?`. See example below.
+ 4. Bookmark this URL :).
+ 
 ## App Usage
 
 ### Basic Controls
@@ -32,6 +33,5 @@ Turn any published google sheet into Sankey-style flashcards on any device, and 
 If you get a card wrong or have difficulty, tap `Redo` until it feels automatic, and then progressively upgrading the depth, waiting at each stage until it again becomes automatic. When it's automatic a few times at a high depth, you can use `Done` to remove it from the loop. Note cards *will* often regress back to "difficult", so expect to downgrade often throughout the process. 
 
 ## Examples
- * [Math Drills Google Sheet](https://docs.google.com/spreadsheets/d/1IfWy8aefe9aNUO3OJ2bKv2Vtb28eEx2XUfMyYPiZv8c/)
- * [Sankey-Flashcards URL (Full)](https://jaxankey.github.io/Sankey-Flashcards/?https://docs.google.com/spreadsheets/d/1IfWy8aefe9aNUO3OJ2bKv2Vtb28eEx2XUfMyYPiZv8c/edit#gid=0)
- * [Sankey-Flashcards URL (Short)](https://jaxankey.github.io/Sankey-Flashcards/?1IfWy8aefe9aNUO3OJ2bKv2Vtb28eEx2XUfMyYPiZv8c).
+ * [Addition and German Google Sheet](https://docs.google.com/spreadsheets/d/1IfWy8aefe9aNUO3OJ2bKv2Vtb28eEx2XUfMyYPiZv8c/)
+ * [Sankey-Flashcards URL for Addition Tab](https://jaxankey.github.io/Sankey-Flashcards/?https://docs.google.com/spreadsheets/d/e/2PACX-1vRucOWbqLrh-TtaDR0-vazl4rVXhWk0BqR5_5rsFNV3698zid1JQuK_n-2lVUogwxl1OvGpVkQ3zg6L/pub?gid=0&single=true&output=csv)
