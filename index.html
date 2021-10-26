@@ -105,9 +105,10 @@
 <body onpointerdown="first_touch();" ontouchstart="first_touch();">
 
 
-  <div class='bottom_controls'>
+  <!--div class='bottom_controls'>
     <select onchange='load_cards();' id='select-sheet' style='margin-bottom:0; flex-grow: 1;'></select>
-  </div><div class='bottom_controls'>
+  </div -->
+  <div class='bottom_controls'>
     <button onclick ='shuffle_cards(true);' style='margin-bottom:0; flex-grow: 1;'>Reset</button>
     <button onclick ='shuffle_cards();' style='margin-bottom:0; flex-grow: 1;'>Shuffle</button>
     <button onclick ='flip_cards();' style='margin-bottom:0; flex-grow: 1;'>Flip</button>
@@ -163,19 +164,12 @@
   </div>
 
 
-  <script src='tabletop.min.js'></script>
   <script type='text/javascript'>    
     
     var button_colors = ['#00F', '#F00', '#F07', '#B0F', '#70F', '#40F'];
 
-    var url = window.location.search; 
-    url = url.substr(1, url.length);
-    console.log(url);
-    if(url.substr(0,8) != 'https://') url = 'https://docs.google.com/spreadsheets/d/'+url+'/edit?usp=sharing';
-    console.log(url);
-
+    
     // Sorry for the globals. This project got bigger than I thought, and I can't be bothered to class it up.
-    var sheets;            // Handle on the sheets data
     var cards=[];          // List of card objects
     var score=0;           // Score
     var cards_remaining=0; // Number of not-"done" cards remaining.
@@ -192,8 +186,8 @@
     var waiting_to_send = false; // Whether we're waiting for the next question in automatic mode.
 
     var sound_maintain = new Audio('maintain.ogg');
-    var sound_correct = new Audio('correct.ogg');
-    var sound_done    = new Audio('done.ogg');
+    var sound_correct  = new Audio('correct.ogg');
+    var sound_done     = new Audio('done.ogg');
     
     // Load the timeout value and mode
     var x = load_cookie('select_delay'); if(x) document.getElementById('select-delay').value = x;
@@ -301,87 +295,37 @@
         return value;
     }
 
-    function init() {
-      Tabletop.init( { key: url, callback: load_data}); //, simpleSheet: true } );
-    }
-
-    // Just converts the format to a list of 2-element lists, one for each card
-    function load_data(d, t) { 
-      
-      // Keep the sheets data for global use.
-      sheets = d; 
-      console.log(sheets);
-      
-      // Get the select object
-      var s = document.getElementById('select-sheet');
-      
-      // Add the new elements
-      var ks = [];
-      for(var k in sheets) {
-        ks.push(k);
-        console.log(' ', k);
-        var o = document.createElement('option');
-        o.text = k;
-        s.add(o);
-      }
-      
-      // Load the cookie if it's there and set the selection
-      var c = load_cookie('select_sheet');
-      console.log('  last sheet', c, ks);
-      if(c != null && ks.includes(c)) {
-        console.log('  setting', c);
-        s.value = c;
-      }
-    
-      // Also save the cookie so it stays at the original (sometimes the sheets come in reverse order!)
-      save_cookie('select_sheet', s.value);
-
-      // Load the cards for this value
-      load_cards();
-
-      // If we're reversed, do this
-      if(load_cookie('reverse') == 'true') flip_cards();
-    }
-
     // Loads the cards for the selected sheet
-    function load_cards() {
+    function load_cards(csv_string) {
 
-      // Get the sheet key
-      var sheet = document.getElementById('select-sheet'); 
-      save_cookie('select_sheet', sheet.value);
+      // Break the csv into lines
+      var lines = csv_string.split(/\r?\n/);
       
-      // Get the data for this sheet
-      var d = sheets[sheet.value].elements;
-      console.log('load_cards()', sheet.value, d.length);
+      // Pop the first line (column labels assumed)
+      lines.splice(0,1);
+      console.log(lines);
 
+      // For each line, split by comma to get the front and back
+      cards  = []; // Messed up deck
+      cards0 = []; // Unshuffled / original deck
+      for(var l in lines) {
+        
+        // Split by comma and make sure there are enough non-empty elements.
+        var s = lines[l].split(',');
+        if(s.length < 2 || s[0] == '' || s[1] == '') continue;
+
+        // Each card is an object with a front, back, and extra data for sorting etc.
+        cards0.push({q:s[0], a:s[1], level:1, id:cards0.length});
+      }
+      
       // If there is no deck
-      if(!d.length) {
+      if(!cards0.length) {
         document.getElementById('div-question').innerHTML = 'No cards?';
         return
       }
-      
-      // Get the column keys from this sheet.
-      var qkey = Object.keys(d[0])[0];
-      var akey = Object.keys(d[0])[1];
-
-      // Clear the existing deck and refill it.
-      cards  = []; // Real, shuffled deck
-      cards0 = []; // Deck as loaded
-      var q, a, n;
-      for(n in d) {
-        
-        // Get the question and answer
-        q = d[n][qkey];
-        a = d[n][akey];
-
-        // Ignore empty rows
-        if(q != '' || a != '') 
-          // Question, answer, last send_to button pressed, unique id (row number in sheet)
-          cards0.push({q:q,a:a,level:1,id:cards0.length});
-      }
 
       // If we have a cookie for each card's level, load this
-      var x = load_cookie('levels_'+sheet.value);
+      var x = load_cookie('levels');
       if(x != null) {
 
         // The cookie should be a list with index being id and value being card level
@@ -395,7 +339,7 @@
       }
 
       // If we have a cookie, e.g., '4,2,3,1,5', load the previous order
-      var x = load_cookie('order_'+sheet.value);
+      var x = load_cookie('order');
       if(x != null) {
 
         // The cookie should be a list with index being id and value being position in deck
@@ -417,7 +361,7 @@
       else cards = cards0;
 
       // Reset the number of cards remaining to practice
-      set_remaining(load_cookie('remaining_'+document.getElementById('select-sheet').value));
+      set_remaining(load_cookie('remaining'));
 
       // Show the top card
       show_start();
@@ -449,7 +393,7 @@
       cards_remaining = n;
 
       // Save the cookie & update the user
-      save_cookie('remaining_'+document.getElementById('select-sheet').value, n);
+      save_cookie('remaining', n);
       document.getElementById('remaining').innerHTML = 'Remaining: '+String(n)+'/'+String(cards.length);
     }
 
@@ -515,13 +459,13 @@
     function save_levels() {
       var levels = [];
       for(var i=0; i<cards0.length; i++) levels[i] = cards0[i].level;
-      save_cookie('levels_'+document.getElementById('select-sheet').value, levels);
+      save_cookie('levels', levels);
     }
 
     function save_order() {
       var order = [];
       for(var i=0; i<cards.length; i++) order[cards[i].id] = i;
-      save_cookie('order_'+document.getElementById('select-sheet').value, order);
+      save_cookie('order', order);
     }
 
     // Sends the top card to index n. 0 means "bottom", undefined means "random > 2"
@@ -764,7 +708,45 @@
       }
     }
 
-    window.addEventListener('DOMContentLoaded', init);
+
+    // Actually queries the external website (any csv url)
+    function get_csv_data_from_url() {
+      // Get the csv data from the supplied URL
+      //
+      // Start with getting the URL from the part after the ? in the address bar
+      var url = window.location.search;
+      //
+      // And drop the ?
+      url = url.substr(1, url.length);
+      console.log(url);
+      //
+      // Now get the data from the URL in a reasonably cross-browser way
+      if (window.XMLHttpRequest) var xmlhttp = new XMLHttpRequest();                   // Code for IE7+, Firefox, Chrome, Opera, Safari
+      else                       var xmlhttp = new ActiveXObject("Microsoft.XMLHTTP"); // Code for IE6, IE5 (gross)
+      //
+      // Set up the handler for when the process reaches its conclusion
+      xmlhttp.onreadystatechange=function() {
+        
+        // When we reach state 4, things are loaded.
+        if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+          
+          // Load the cards for this value
+          load_cards(xmlhttp.responseText);
+
+          // If we're reversed, do this
+          if(load_cookie('reverse') == 'true') flip_cards();
+        }
+      };
+      //
+      // Start the process
+      xmlhttp.open("GET", url, false);
+      xmlhttp.send(); 
+    }   
+
+    // Start the show!
+    get_csv_data_from_url(); 
+
+
   </script>
 
 </body></html>
