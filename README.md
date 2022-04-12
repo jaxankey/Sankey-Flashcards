@@ -1,12 +1,12 @@
 <p align="center"><img src="https://github.com/jaxankey/Sankey-Flashcards/raw/main/screenshots/screenshot.png"></p>
 
-# A Google Sheets or CSV Flashcard Web-App
+# A Google Sheets or Tab-Separated Values (TSV) Flashcard Web-App
 
-Turn any web-published CSV or [Google Sheet](https://docs.google.com/spreadsheets/u/0/) into Sankey-brand flashcards on any device, and share your creation with a permanent URL.
+Turn any web-published TSV or [Google Sheet](https://docs.google.com/spreadsheets/u/0/) into Sankey-brand flashcards on any device, and share your creation with a permanent URL.
 
-## Using Any Web-Published CSV File
+## Using Any Web-Published TSV File
 
-Any URL pointing to a CSV file will work, provided the CSV file has two columns: the first column contains the "questions", and the second column contains "answers". The first row will be skipped (use this for column labels!), as will any rows with blank entries in the first or second column. Once you have this web address, paste it to the end of this: 
+Any URL pointing to a TSV file will work, provided the TSV file has two columns: the first column contains the "questions", and the second column contains "answers". The first row will be skipped (use this for column labels!), as will any rows with blank entries in the first or second column. Once you have this web address, paste it to the end of this: 
 
 [https://jaxankey.github.io/Sankey-Flashcards/?](https://jaxankey.github.io/Sankey-Flashcards/?)
 
@@ -15,7 +15,7 @@ as in the examples below. Bookmark the resulting web address. :)
 ## Using a Google Sheet
 
  1. Create a [Google Sheets](https://docs.google.com/spreadsheets/u/0/) document with columns conforming to the above specifications.
- 2. Select `File` -> `Publish to the web`, choose the desired sheets, select `Comma-separated values (.csv)'`, then push the green `Publish` button.
+ 2. Select `File` -> `Publish to the web`, choose the desired sheets, select `Tab-separated values (.tsv)'`, then push the green `Publish` button.
  3. Type `ctrl`+`c` to copy the gnasty web address shown in this dialog, then
  4. Bookmark this URL :).
 
