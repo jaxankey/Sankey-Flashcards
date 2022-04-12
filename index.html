@@ -307,7 +307,7 @@
       for(var l in lines) {
         
         // Split by comma and make sure there are enough non-empty elements.
-        var s = lines[l].split(',');
+        var s = lines[l].split('\t');
         if(s.length < 2 || s[0] == '' || s[1] == '') continue;
 
         // Each card is an object with a front, back, and extra data for sorting etc.
